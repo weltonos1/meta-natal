@@ -43,7 +43,7 @@
           <div class="flex items-center gap-2">
             <h2 id="user-name" class="font-bold text-white text-base leading-none">Welton</h2>
             <span id="user-gender-tag" class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">♂ Masc</span>
-            <span id="user-age-tag" class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-800 text-slate-300 border border-slate-700">-- anos</span>
+            <span id="user-age-tag" class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-800 text-slate-300 border border-slate-700">32 anos</span>
           </div>
           <span class="text-[11px] text-slate-400 flex items-center gap-1 mt-0.5">
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Ativo & Sincronizado
@@ -101,7 +101,7 @@
           </span>
           <div class="flex items-baseline gap-1 mt-0.5">
             <span id="water-current-text" class="text-xl font-black text-white">0</span>
-            <span class="text-xs text-slate-400">/ <span id="water-target-text">2500</span> ml</span>
+            <span class="text-xs text-slate-400">/ <span id="water-target-text">3000</span> ml</span>
           </div>
         </div>
         <div class="flex gap-1.5">
@@ -195,7 +195,6 @@
         </span>
       </div>
 
-      <!-- ALERTA DA PRÓXIMA DOSE -->
       <div id="dose-reminder-box" class="bg-slate-900/90 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between text-xs">
         <span class="text-slate-400"><i class="fa-regular fa-clock text-emerald-400 mr-1.5"></i> Próxima Aplicação:</span>
         <span id="dose-next-days" class="font-bold text-emerald-300">Em 7 dias</span>
@@ -211,208 +210,4 @@
               <option value="7.5">7.5 mg</option>
               <option value="10.0">10.0 mg</option>
               <option value="12.5">12.5 mg</option>
-              <option value="15.0">15.0 mg</option>
-            </select>
-          </div>
-          <div>
-            <label class="text-[10px] font-semibold text-slate-400 block mb-1">Local de Aplicação</label>
-            <select id="select-site" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
-              <option value="Abdômen Dir.">Abdômen Dir.</option>
-              <option value="Abdômen Esq.">Abdômen Esq.</option>
-              <option value="Coxa Dir.">Coxa Dir.</option>
-              <option value="Coxa Esq.">Coxa Esq.</option>
-              <option value="Braço">Braço</option>
-            </select>
-          </div>
-        </div>
-        <button type="submit" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/60 font-semibold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-2">
-          <i class="fa-solid fa-plus text-emerald-400"></i> Registrar Aplicação Semanal
-        </button>
-      </form>
-
-      <div id="dose-history" class="space-y-1.5 pt-1"></div>
-    </div>
-
-    <!-- DIÁRIO DE MEDIDAS CORPORAIS -->
-    <details class="glass-card rounded-2xl text-xs">
-      <summary class="p-4 font-bold text-slate-300 cursor-pointer flex justify-between items-center hover:text-white">
-        <span class="flex items-center gap-2"><i class="fa-solid fa-ruler-horizontal text-emerald-400"></i> Diário de Medidas Corporais (cm)</span>
-        <i class="fa-solid fa-chevron-down text-slate-500 text-xs"></i>
-      </summary>
-      <div class="p-4 pt-0 space-y-3 border-t border-slate-800/60 mt-2">
-        <form onsubmit="saveBodyMeasurements(event)" class="space-y-3">
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="text-slate-400 block mb-1">Cintura (cm)</label>
-              <input type="text" id="measure-waist" placeholder="Ex: 95" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white">
-            </div>
-            <div>
-              <label class="text-slate-400 block mb-1">Quadril (cm)</label>
-              <input type="text" id="measure-hip" placeholder="Ex: 105" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white">
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="text-slate-400 block mb-1">Coxa (cm)</label>
-              <input type="text" id="measure-thigh" placeholder="Ex: 60" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white">
-            </div>
-            <div>
-              <label class="text-slate-400 block mb-1">Braço (cm)</label>
-              <input type="text" id="measure-arm" placeholder="Ex: 38" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white">
-            </div>
-          </div>
-          <button type="submit" class="w-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 py-2.5 rounded-xl font-bold hover:bg-emerald-500/30 transition">
-            Registrar Novas Medidas
-          </button>
-        </form>
-
-        <div id="measurements-history" class="space-y-1.5 pt-2"></div>
-      </div>
-    </details>
-
-    <!-- CONQUISTAS & GAMIFICAÇÃO DO CASAL -->
-    <div class="glass-card p-4 rounded-2xl space-y-3">
-      <h3 class="text-xs font-bold text-white flex items-center gap-2 uppercase tracking-wider">
-        <i class="fa-solid fa-trophy text-amber-400"></i> Conquistas Desbloqueadas
-      </h3>
-      <div id="badges-container" class="grid grid-cols-2 gap-2">
-        <!-- Injetado via JS -->
-      </div>
-    </div>
-
-    <!-- TABELA DE HISTÓRICO DE PESO -->
-    <div class="glass-card p-4 rounded-2xl space-y-3">
-      <h3 class="text-xs font-bold text-white flex items-center gap-2 uppercase tracking-wider">
-        <i class="fa-solid fa-list-check text-emerald-400"></i> Histórico de Pesagens
-      </h3>
-      <div id="weight-history-list" class="max-h-48 overflow-y-auto space-y-2 pr-1"></div>
-    </div>
-
-    <!-- CONFIGURAÇÃO COMPLETA DO PERFIL -->
-    <details class="glass-card rounded-2xl text-xs">
-      <summary class="p-4 font-bold text-slate-300 cursor-pointer flex justify-between items-center hover:text-white">
-        <span>👤 Editar Perfil, Idade, Altura, Pesos & Metas</span>
-        <i class="fa-solid fa-chevron-down text-slate-500 text-xs"></i>
-      </summary>
-      <div class="p-4 pt-0 space-y-3 border-t border-slate-800/60 mt-2">
-        <div class="grid grid-cols-3 gap-2">
-          <div>
-            <label class="text-slate-400 block mb-1">Gênero</label>
-            <select id="config-gender" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white">
-              <option value="masculino">Masculino ♂️</option>
-              <option value="feminino">Feminino ♀️</option>
-            </select>
-          </div>
-          <div>
-            <label class="text-slate-400 block mb-1">Idade (anos)</label>
-            <input type="number" id="config-age" placeholder="Ex: 30" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white">
-          </div>
-          <div>
-            <label class="text-slate-400 block mb-1">Altura (cm)</label>
-            <input type="number" id="config-height" placeholder="Ex: 175" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white">
-          </div>
-        </div>
-
-        <div class="grid grid-cols-3 gap-2">
-          <div>
-            <label class="text-slate-400 block mb-1">Peso Inicial</label>
-            <input type="text" id="config-initial" placeholder="Ex: 142.9" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white">
-          </div>
-          <div>
-            <label class="text-slate-400 block mb-1">Peso Atual</label>
-            <input type="text" id="config-current" placeholder="Ex: 142.6" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white">
-          </div>
-          <div>
-            <label class="text-slate-400 block mb-1">Meta Natal</label>
-            <input type="text" id="config-target" placeholder="Ex: 120.0" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white">
-          </div>
-        </div>
-
-        <div>
-          <label class="text-slate-400 block mb-1">Meta de Água Diária (ml)</label>
-          <input type="number" id="config-water-target" placeholder="Ex: 2500" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white">
-        </div>
-
-        <div>
-          <label class="text-slate-400 block mb-1">Ritmo Semanal Desejado (kg)</label>
-          <input type="text" id="config-weekly" placeholder="Ex: 0.9" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white">
-        </div>
-
-        <button onclick="saveConfigs()" class="w-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 py-2.5 rounded-xl font-bold hover:bg-emerald-500/30 transition">
-          Salvar Todos os Dados
-        </button>
-      </div>
-    </details>
-
-  </main>
-
-  <script>
-    // CONFIGURAÇÃO DO FIREBASE
-    const firebaseConfig = {
-      apiKey: "AIzaSyCHRRPhAxp8kaKRd1CbmyBMUPBqObbd9xE",
-      authDomain: "metanatalapp.firebaseapp.com",
-      projectId: "metanatalapp",
-      storageBucket: "metanatalapp.firebasestorage.app",
-      messagingSenderId: "159913382278",
-      appId: "1:159913382278:web:cf747a88f8c420aee51c07",
-      measurementId: "G-V9RS6R5RTD"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-
-    let activeProfile = localStorage.getItem('meta_natal_active_profile') || 'Welton';
-    let chartInstance = null;
-
-    const defaultData = {
-      Welton: { gender: 'masculino', age: 32, height: 175, initial: 142.95, current: 142.60, target: 120.00, weeklyGoal: 0.90, waterTarget: 3000, waterCurrent: 0, weights: [], doses: [], measurements: [] },
-      Andressa: { gender: 'feminino', age: 34, height: 155, initial: 67.40, current: 67.40, target: 60.00, weeklyGoal: 0.80, waterTarget: 2500, waterCurrent: 0, weights: [], doses: [], measurements: [] }
-    };
-
-    function parseNum(val) {
-      if (!val && val !== 0) return 0;
-      if (typeof val === 'number') return val;
-      return parseFloat(val.toString().replace(',', '.')) || 0;
-    }
-
-    function getLocalData(profileName) {
-      const stored = localStorage.getItem(`meta_natal_db_${profileName.toLowerCase()}`);
-      if (stored) return JSON.parse(stored);
-      return defaultData[profileName] || defaultData['Welton'];
-    }
-
-    function saveLocalData(profileName, data) {
-      localStorage.setItem(`meta_natal_db_${profileName.toLowerCase()}`, JSON.stringify(data));
-      try {
-        db.collection('profiles').doc(profileName.toLowerCase()).set(data);
-      } catch (e) {
-        console.log('Sincronizando localmente:', e);
-      }
-    }
-
-    window.onload = () => {
-      loadProfile(activeProfile);
-    };
-
-    function switchProfile(profileName) {
-      activeProfile = profileName;
-      localStorage.setItem('meta_natal_active_profile', profileName);
-      loadProfile(profileName);
-    }
-
-    function updateProfileUI() {
-      const btnWelton = document.getElementById('btn-welton');
-      const btnAndressa = document.getElementById('btn-andressa');
-
-      if (activeProfile === 'Welton') {
-        btnWelton.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20";
-        btnAndressa.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white";
-      } else {
-        btnAndressa.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-rose-500 text-slate-950 shadow-md shadow-rose-500/20";
-        btnWelton.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white";
-      }
-    }
-
-    async function loadProfile(profileName) {
-      updateProfileUI();
-      let userData = getLocalData(profileName);
+              <option value="15.0">15.0
