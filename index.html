@@ -250,6 +250,12 @@
 
     let profilesData = JSON.parse(JSON.stringify(defaultProfiles));
 
+    // Renderiza imediatamente com os dados locais para garantir que a tela nunca fique vazia
+    window.addEventListener('DOMContentLoaded', () => {
+      switchProfile('Welton');
+      loadDataFromCloud();
+    });
+
     async function loadDataFromCloud() {
       try {
         const wDoc = await db.collection('profiles').doc('Welton').get();
@@ -269,9 +275,8 @@
         switchProfile(currentProfile);
       } catch (error) {
         console.error("Erro ao carregar do Firestore:", error);
-        document.getElementById('sync-status-text').innerText = "Modo Local";
+        document.getElementById('sync-status-text').innerText = "Modo Local Seguro";
         document.getElementById('sync-dot').className = "w-1.5 h-1.5 rounded-full bg-amber-400";
-        switchProfile(currentProfile);
       }
     }
 
@@ -498,7 +503,7 @@
       data.lastDoseDate = document.getElementById('input-dose-date').value;
       updateMetrics();
       saveProfileToCloud(currentProfile);
-      alert('Protocolo de dose atualizado e salvo na nuvem com sucesso!');
+      alert('Protocolo de dose atualizado e salvo com sucesso!');
     }
 
     function renderChart() {
@@ -536,10 +541,6 @@
         }
       });
     }
-
-    window.onload = () => {
-      loadDataFromCloud();
-    };
   </script>
 </body>
 </html>
