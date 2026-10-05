@@ -2,21 +2,24 @@
 <html lang="pt-BR" class="h-full bg-slate-950 text-slate-100">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>FitCouple Pro - Meta Natal 🎄</title>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Chart.js para Gráficos -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
+  <!-- PWA Setup -->
   <meta name="theme-color" content="#020617">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="FitCouple">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2964/2964514.png">
+
+  <!-- CDNs External Libraries -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <style>
     ::-webkit-scrollbar { width: 6px; }
@@ -39,7 +42,7 @@
         <div>
           <div class="flex items-center gap-2">
             <h2 id="user-name" class="font-bold text-white text-base leading-none">Welton</h2>
-            <span id="user-gender-tag" class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">♂️️ Masc</span>
+            <span id="user-gender-tag" class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">♂ Masc</span>
             <span id="user-age-tag" class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-800 text-slate-300 border border-slate-700">-- anos</span>
           </div>
           <span class="text-[11px] text-slate-400 flex items-center gap-1 mt-0.5">
@@ -80,7 +83,7 @@
       <!-- BARRA DE PROGRESSO DA META -->
       <div class="space-y-1.5">
         <div class="flex justify-between text-xs font-semibold">
-          <span class="text-slate-400">Progresso da Meta</span>
+          <span class="text-slate-400">Progresso do Objetivo</span>
           <span id="progress-percent" class="text-emerald-400">0%</span>
         </div>
         <div class="w-full bg-slate-800 rounded-full h-3 p-0.5 overflow-hidden border border-slate-700/50">
@@ -89,7 +92,37 @@
       </div>
     </div>
 
-    <!-- CARD DE IMC & DIAGNÓSTICO DE PESO BIOLÓGICO -->
+    <!-- WIDGET 1: REGISTRO DE ÁGUA / HIDRATAÇÃO -->
+    <div class="glass-card p-4 rounded-2xl border-l-4 border-sky-400 space-y-3">
+      <div class="flex justify-between items-center">
+        <div>
+          <span class="text-[10px] font-bold uppercase text-sky-400 block tracking-wider">
+            <i class="fa-solid fa-droplet mr-1"></i> Hidratação Diária
+          </span>
+          <div class="flex items-baseline gap-1 mt-0.5">
+            <span id="water-current-text" class="text-xl font-black text-white">0</span>
+            <span class="text-xs text-slate-400">/ <span id="water-target-text">2500</span> ml</span>
+          </div>
+        </div>
+        <div class="flex gap-1.5">
+          <button onclick="addWater(250)" class="bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/30 font-bold text-xs px-3 py-2 rounded-xl transition">
+            +250ml
+          </button>
+          <button onclick="addWater(500)" class="bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/30 font-bold text-xs px-3 py-2 rounded-xl transition">
+            +500ml
+          </button>
+          <button onclick="resetWater()" class="bg-slate-800 hover:bg-slate-700 text-slate-400 px-2.5 py-2 rounded-xl text-xs">
+            <i class="fa-solid fa-rotate-left"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+        <div id="water-bar" class="bg-sky-400 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <!-- WIDGET 2: DIAGNÓSTICO DE IMC -->
     <div class="glass-card p-4 rounded-2xl border-l-4 border-emerald-500 flex items-center justify-between">
       <div>
         <span class="text-[10px] font-bold uppercase text-slate-400 block">Índice de Massa Corporal (IMC)</span>
@@ -124,7 +157,7 @@
       </div>
     </div>
 
-    <!-- REGISTRAR NOVO PESO DA SEMANA -->
+    <!-- REGISTRAR NOVO PESO -->
     <div class="glass-card p-4 rounded-2xl space-y-3">
       <div class="flex justify-between items-center">
         <h3 class="text-xs font-bold text-white flex items-center gap-2 uppercase tracking-wider">
@@ -151,7 +184,7 @@
       </div>
     </div>
 
-    <!-- PROTOCOLO TIRZEPATIDA & DOSES -->
+    <!-- PROTOCOLO TIRZEPATIDA & DOSES COM LEMBRETE -->
     <div class="glass-card p-4 rounded-2xl space-y-3">
       <div class="flex justify-between items-center">
         <h3 class="text-xs font-bold text-white flex items-center gap-2 uppercase tracking-wider">
@@ -160,6 +193,12 @@
         <span id="dose-label" class="text-[10px] font-bold bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-lg border border-emerald-500/20">
           Dose Atual: --
         </span>
+      </div>
+
+      <!-- ALERTA DA PRÓXIMA DOSE -->
+      <div id="dose-reminder-box" class="bg-slate-900/90 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between text-xs">
+        <span class="text-slate-400"><i class="fa-regular fa-clock text-emerald-400 mr-1.5"></i> Próxima Aplicação:</span>
+        <span id="dose-next-days" class="font-bold text-emerald-300">Em 7 dias</span>
       </div>
 
       <form onsubmit="saveDose(event)" class="space-y-2.5">
@@ -194,6 +233,53 @@
       <div id="dose-history" class="space-y-1.5 pt-1"></div>
     </div>
 
+    <!-- DIÁRIO DE MEDIDAS CORPORAIS -->
+    <details class="glass-card rounded-2xl text-xs">
+      <summary class="p-4 font-bold text-slate-300 cursor-pointer flex justify-between items-center hover:text-white">
+        <span class="flex items-center gap-2"><i class="fa-solid fa-ruler-horizontal text-emerald-400"></i> Diário de Medidas Corporais (cm)</span>
+        <i class="fa-solid fa-chevron-down text-slate-500 text-xs"></i>
+      </summary>
+      <div class="p-4 pt-0 space-y-3 border-t border-slate-800/60 mt-2">
+        <form onsubmit="saveBodyMeasurements(event)" class="space-y-3">
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="text-slate-400 block mb-1">Cintura (cm)</label>
+              <input type="text" id="measure-waist" placeholder="Ex: 95" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white">
+            </div>
+            <div>
+              <label class="text-slate-400 block mb-1">Quadril (cm)</label>
+              <input type="text" id="measure-hip" placeholder="Ex: 105" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white">
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="text-slate-400 block mb-1">Coxa (cm)</label>
+              <input type="text" id="measure-thigh" placeholder="Ex: 60" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white">
+            </div>
+            <div>
+              <label class="text-slate-400 block mb-1">Braço (cm)</label>
+              <input type="text" id="measure-arm" placeholder="Ex: 38" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white">
+            </div>
+          </div>
+          <button type="submit" class="w-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 py-2.5 rounded-xl font-bold hover:bg-emerald-500/30 transition">
+            Registrar Novas Medidas
+          </button>
+        </form>
+
+        <div id="measurements-history" class="space-y-1.5 pt-2"></div>
+      </div>
+    </details>
+
+    <!-- CONQUISTAS & GAMIFICAÇÃO DO CASAL -->
+    <div class="glass-card p-4 rounded-2xl space-y-3">
+      <h3 class="text-xs font-bold text-white flex items-center gap-2 uppercase tracking-wider">
+        <i class="fa-solid fa-trophy text-amber-400"></i> Conquistas Desbloqueadas
+      </h3>
+      <div id="badges-container" class="grid grid-cols-2 gap-2">
+        <!-- Injetado via JS -->
+      </div>
+    </div>
+
     <!-- TABELA DE HISTÓRICO DE PESO -->
     <div class="glass-card p-4 rounded-2xl space-y-3">
       <h3 class="text-xs font-bold text-white flex items-center gap-2 uppercase tracking-wider">
@@ -202,8 +288,8 @@
       <div id="weight-history-list" class="max-h-48 overflow-y-auto space-y-2 pr-1"></div>
     </div>
 
-    <!-- CONFIGURAÇÃO COMPLETA DO PERFIL COM EDITO DE PESO ATUAL -->
-    <details class="glass-card rounded-2xl text-xs" open>
+    <!-- CONFIGURAÇÃO COMPLETA DO PERFIL -->
+    <details class="glass-card rounded-2xl text-xs">
       <summary class="p-4 font-bold text-slate-300 cursor-pointer flex justify-between items-center hover:text-white">
         <span>👤 Editar Perfil, Idade, Altura, Pesos & Metas</span>
         <i class="fa-solid fa-chevron-down text-slate-500 text-xs"></i>
@@ -243,6 +329,11 @@
         </div>
 
         <div>
+          <label class="text-slate-400 block mb-1">Meta de Água Diária (ml)</label>
+          <input type="number" id="config-water-target" placeholder="Ex: 2500" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white">
+        </div>
+
+        <div>
           <label class="text-slate-400 block mb-1">Ritmo Semanal Desejado (kg)</label>
           <input type="text" id="config-weekly" placeholder="Ex: 0.9" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white">
         </div>
@@ -273,10 +364,9 @@
     let activeProfile = localStorage.getItem('meta_natal_active_profile') || 'Welton';
     let chartInstance = null;
 
-    // ESTRUTURA PADRÃO COM DEFINIÇÃO DE MASCULINO / FEMININO
     const defaultData = {
-      Welton: { gender: 'masculino', age: 32, height: 175, initial: 142.95, current: 142.60, target: 120.00, weeklyGoal: 0.90, weights: [], doses: [] },
-      Andressa: { gender: 'feminino', age: 34, height: 155, initial: 67.40, current: 67.40, target: 60.00, weeklyGoal: 0.80, weights: [], doses: [] }
+      Welton: { gender: 'masculino', age: 32, height: 175, initial: 142.95, current: 142.60, target: 120.00, weeklyGoal: 0.90, waterTarget: 3000, waterCurrent: 0, weights: [], doses: [], measurements: [] },
+      Andressa: { gender: 'feminino', age: 34, height: 155, initial: 67.40, current: 67.40, target: 60.00, weeklyGoal: 0.80, waterTarget: 2500, waterCurrent: 0, weights: [], doses: [], measurements: [] }
     };
 
     function parseNum(val) {
@@ -287,9 +377,7 @@
 
     function getLocalData(profileName) {
       const stored = localStorage.getItem(`meta_natal_db_${profileName.toLowerCase()}`);
-      if (stored) {
-        return JSON.parse(stored);
-      }
+      if (stored) return JSON.parse(stored);
       return defaultData[profileName] || defaultData['Welton'];
     }
 
@@ -328,266 +416,3 @@
     async function loadProfile(profileName) {
       updateProfileUI();
       let userData = getLocalData(profileName);
-
-      try {
-        const doc = await db.collection('profiles').doc(profileName.toLowerCase()).get();
-        if (doc.exists) {
-          userData = doc.data();
-          localStorage.setItem(`meta_natal_db_${profileName.toLowerCase()}`, JSON.stringify(userData));
-        }
-      } catch (err) {
-        console.log("Serviço rodando localmente.");
-      }
-
-      renderDashboard(userData);
-    }
-
-    function renderDashboard(userData) {
-      document.getElementById('user-name').innerText = activeProfile;
-      document.getElementById('user-avatar').innerText = activeProfile.charAt(0).toUpperCase();
-
-      const gender = userData.gender || (activeProfile === 'Andressa' ? 'feminino' : 'masculino');
-      const age = userData.age || (activeProfile === 'Andressa' ? 34 : 32);
-      const height = parseNum(userData.height) || (activeProfile === 'Andressa' ? 155 : 175);
-      const initWeight = parseNum(userData.initial);
-      const currWeight = parseNum(userData.current);
-      const targetWeight = parseNum(userData.target);
-      const weeklyGoal = parseNum(userData.weeklyGoal);
-
-      document.getElementById('user-gender-tag').innerText = gender === 'feminino' ? '♀️ Fem' : '♂️ Masc';
-      document.getElementById('user-gender-tag').className = gender === 'feminino' 
-        ? 'inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20'
-        : 'inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
-
-      document.getElementById('user-age-tag').innerText = `${age} anos`;
-
-      document.getElementById('weight-initial').innerText = `${initWeight.toFixed(1)} kg`;
-      document.getElementById('weight-current').innerText = `${currWeight.toFixed(1)} kg`;
-      document.getElementById('weight-target').innerText = `${targetWeight.toFixed(1)} kg`;
-      document.getElementById('weekly-rate-display').innerText = `-${weeklyGoal.toFixed(1)} kg/sem`;
-
-      const lostKg = (initWeight - currWeight).toFixed(1);
-      document.getElementById('weight-lost').innerText = lostKg > 0 ? `-${lostKg} kg` : `${Math.abs(lostKg)} kg`;
-
-      // IMC E CLASSIFICAÇÃO COM BASE BIOLÓGICA
-      document.getElementById('imc-gender-text').innerText = gender === 'feminino' ? 'Feminino ♀️' : 'Masculino ♂️';
-      if (height > 0 && currWeight > 0) {
-        const heightM = height / 100;
-        const imc = (currWeight / (heightM * heightM)).toFixed(1);
-        document.getElementById('imc-value').innerText = imc;
-
-        let statusText = "Normal";
-        let statusColor = "text-emerald-400";
-
-        if (imc < 18.5) { statusText = "Abaixo do Peso"; statusColor = "text-amber-400"; }
-        else if (imc < 24.9) { statusText = "Peso Normal"; statusColor = "text-emerald-400"; }
-        else if (imc < 29.9) { statusText = "Sobrepeso"; statusColor = "text-amber-400"; }
-        else if (imc < 34.9) { statusText = "Obesidade Grau I"; statusColor = "text-rose-400"; }
-        else if (imc < 39.9) { statusText = "Obesidade Grau II"; statusColor = "text-rose-500"; }
-        else { statusText = "Obesidade Grau III"; statusColor = "text-rose-600"; }
-
-        const imcStatusEl = document.getElementById('imc-status');
-        imcStatusEl.innerText = statusText;
-        imcStatusEl.className = `text-xs font-bold px-2 py-0.5 rounded-md bg-slate-800 border border-slate-700 ${statusColor}`;
-      } else {
-        document.getElementById('imc-value').innerText = "--";
-        document.getElementById('imc-status').innerText = "Configure a altura";
-      }
-
-      // PROGRESSO DE METAS
-      const totalToLose = initWeight - targetWeight;
-      const currentLost = initWeight - currWeight;
-      let percent = 0;
-      if (totalToLose > 0) {
-        percent = Math.min(Math.max((currentLost / totalToLose) * 100, 0), 100).toFixed(0);
-      }
-      document.getElementById('progress-percent').innerText = `${percent}%`;
-      document.getElementById('progress-bar').style.width = `${percent}%`;
-
-      // INPUTS DE EDICAO DE PERFIL
-      document.getElementById('config-gender').value = gender;
-      document.getElementById('config-age').value = age;
-      document.getElementById('config-height').value = height;
-      document.getElementById('config-initial').value = initWeight;
-      document.getElementById('config-current').value = currWeight;
-      document.getElementById('config-target').value = targetWeight;
-      document.getElementById('config-weekly').value = weeklyGoal;
-
-      // NATAL COUNTDOWN
-      const today = new Date();
-      const christmas = new Date(today.getFullYear(), 11, 25);
-      if (today > christmas) christmas.setFullYear(christmas.getFullYear() + 1);
-
-      const diffTime = Math.abs(christmas - today);
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      document.getElementById('days-countdown').innerText = `${diffDays} dias`;
-
-      renderChart(userData.weights, currWeight);
-      renderHistoryLists(userData);
-    }
-
-    function renderChart(weightsList = [], currWeight) {
-      const ctx = document.getElementById('weightChart').getContext('2d');
-      const labels = weightsList.map(w => w.date);
-      const dataPoints = weightsList.map(w => parseNum(w.weight));
-
-      if (chartInstance) chartInstance.destroy();
-
-      const isAndressa = activeProfile === 'Andressa';
-      const color = isAndressa ? '#f43f5e' : '#10b981';
-      const bgGradient = ctx.createLinearGradient(0, 0, 0, 200);
-      bgGradient.addColorStop(0, isAndressa ? 'rgba(244, 63, 94, 0.25)' : 'rgba(16, 185, 129, 0.25)');
-      bgGradient.addColorStop(1, 'rgba(15, 23, 42, 0)');
-
-      chartInstance = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: labels.length ? labels : ['Atual'],
-          datasets: [{
-            label: 'Peso (kg)',
-            data: dataPoints.length ? dataPoints : [currWeight],
-            borderColor: color,
-            borderWidth: 3,
-            backgroundColor: bgGradient,
-            fill: true,
-            tension: 0.35,
-            pointBackgroundColor: color,
-            pointBorderColor: '#020617',
-            pointBorderWidth: 2,
-            pointRadius: 5
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: {
-            x: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#64748b', font: { size: 10 } } },
-            y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#64748b', font: { size: 10 } } }
-          }
-        }
-      });
-    }
-
-    function renderHistoryLists(userData) {
-      const historyList = document.getElementById('weight-history-list');
-      const weights = userData.weights || [];
-      if (weights.length === 0) {
-        historyList.innerHTML = `<span class="text-xs text-slate-500 block text-center py-2">Sem pesagens registadas.</span>`;
-      } else {
-        historyList.innerHTML = weights.slice().reverse().map((w, index) => {
-          const realIndex = weights.length - 1 - index;
-          return `
-            <div class="flex justify-between items-center text-xs bg-slate-900/80 p-2.5 rounded-xl border border-slate-800/80">
-              <span class="text-slate-400 font-medium">${w.date}</span>
-              <span class="text-white font-bold">${parseNum(w.weight).toFixed(1)} kg</span>
-              <button onclick="deleteWeight(${realIndex})" class="text-rose-400 hover:text-rose-300 p-1">
-                <i class="fa-solid fa-trash-can"></i>
-              </button>
-            </div>
-          `;
-        }).join('');
-      }
-
-      const doseHistoryEl = document.getElementById('dose-history');
-      const doses = userData.doses || [];
-      if (doses.length === 0) {
-        doseHistoryEl.innerHTML = `<span class="text-xs text-slate-500 block text-center py-1">Nenhuma aplicação registrada.</span>`;
-        document.getElementById('dose-label').innerText = 'Sem Dose';
-      } else {
-        doseHistoryEl.innerHTML = doses.slice(-3).reverse().map((d, index) => {
-          const realIndex = doses.length - 1 - index;
-          return `
-            <div class="flex justify-between items-center text-xs bg-slate-900/80 p-2 rounded-xl border border-slate-800">
-              <span class="text-slate-300 font-semibold">${d.date} - ${d.mg} mg</span>
-              <div class="flex items-center gap-2">
-                <span class="text-slate-400">${d.site}</span>
-                <button onclick="deleteDose(${realIndex})" class="text-rose-400 hover:text-rose-300">
-                  <i class="fa-solid fa-xmark"></i>
-                </button>
-              </div>
-            </div>
-          `;
-        }).join('');
-
-        const lastDose = doses[doses.length - 1];
-        document.getElementById('dose-label').innerText = `Dose Atual: ${lastDose.mg} mg`;
-      }
-    }
-
-    function saveWeight(e) {
-      e.preventDefault();
-      const valInput = document.getElementById('input-weight').value;
-      const val = parseNum(valInput);
-      if (!val) return;
-
-      const userData = getLocalData(activeProfile);
-      userData.current = val;
-      if (!userData.weights) userData.weights = [];
-      userData.weights.push({ date: new Date().toLocaleDateString('pt-BR'), weight: val });
-
-      saveLocalData(activeProfile, userData);
-      document.getElementById('input-weight').value = '';
-      renderDashboard(userData);
-    }
-
-    function deleteWeight(index) {
-      const userData = getLocalData(activeProfile);
-      userData.weights.splice(index, 1);
-      if (userData.weights.length > 0) {
-        userData.current = parseNum(userData.weights[userData.weights.length - 1].weight);
-      }
-
-      saveLocalData(activeProfile, userData);
-      renderDashboard(userData);
-    }
-
-    function saveDose(e) {
-      e.preventDefault();
-      const mg = document.getElementById('select-dose-mg').value;
-      const site = document.getElementById('select-site').value;
-
-      const userData = getLocalData(activeProfile);
-      if (!userData.doses) userData.doses = [];
-      userData.doses.push({
-        date: new Date().toLocaleDateString('pt-BR'),
-        mg: mg,
-        site: site
-      });
-
-      saveLocalData(activeProfile, userData);
-      renderDashboard(userData);
-    }
-
-    function deleteDose(index) {
-      const userData = getLocalData(activeProfile);
-      userData.doses.splice(index, 1);
-      saveLocalData(activeProfile, userData);
-      renderDashboard(userData);
-    }
-
-    function saveConfigs() {
-      const genderVal = document.getElementById('config-gender').value;
-      const ageVal = parseNum(document.getElementById('config-age').value);
-      const heightVal = parseNum(document.getElementById('config-height').value);
-      const initVal = parseNum(document.getElementById('config-initial').value);
-      const currVal = parseNum(document.getElementById('config-current').value);
-      const targetVal = parseNum(document.getElementById('config-target').value);
-      const weeklyVal = parseNum(document.getElementById('config-weekly').value);
-
-      const userData = getLocalData(activeProfile);
-      userData.gender = genderVal;
-      userData.age = ageVal;
-      userData.height = heightVal;
-      userData.initial = initVal;
-      userData.current = currVal;
-      userData.target = targetVal;
-      userData.weeklyGoal = weeklyVal;
-
-      saveLocalData(activeProfile, userData);
-      renderDashboard(userData);
-      alert('Dados salvos e atualizados com sucesso!');
-    }
-  </script>
-</body>
-</html>
