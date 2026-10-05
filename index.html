@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full bg-slate-900 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meta Natal - Emagrecimento em Casal Cloud</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Chart.js para Gráficos -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+<body class="h-full font-sans antialiased selection:bg-emerald-500 selection:text-white">
+
+  <!-- TELA DE AUTENTICAÇÃO / LOGIN -->
+  <div id="screen-auth" class="min-h-full flex flex-col justify-center items-center p-6 text-center">
+    <div class="max-w-md w-full space-y-6 bg-slate-800/80 p-6 rounded-2xl border border-slate-700/50 shadow-2xl backdrop-blur">
+      <div>
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500/10 text-emerald-400 mb-3 ring-1 ring-emerald-500/20">
+          <i class="fa-solid fa-scale-balanced text-2xl"></i>
+        </div>
+        <h1 class="text-2xl font-extrabold tracking-tight text-white">Meta até o Natal 🎄</h1>
+        <p class="mt-1 text-xs text-slate-400">Acesse sua conta para sincronizar dados na nuvem</p>
+      </div>
+
+      <div class="space-y-3 text-left">
+        <div>
+          <label class="text-xs font-semibold text-slate-400 block mb-1">E-mail</label>
+          <input type="email" id="authEmail" placeholder="seuemail@exemplo.com" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-slate-400 block mb-1">Senha</label>
+          <input type="password" id="authPassword" placeholder="******" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-slate-400 block mb-1">Selecione o Usuário (Para novo cadastro)</label>
+          <select id="authName" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
+            <option value="Welton">Welton</option>
+            <option value="Andressa">Andressa</option>
+          </select>
+        </div>
+      </div>
+
+      <p id="authError" class="text-xs text-rose-400 min-h-[1rem]"></p>
+
+      <div class="flex flex-col gap-2">
+        <button onclick="login()" class="w-full py-2.5 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-sm transition">
+          <i class="fa-solid fa-right-to-bracket mr-2"></i> Entrar
+        </button>
+        <button onclick="register()" class="w-full py-2.5 px-4 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-medium text-sm transition">
+          Criar Nova Conta
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TELA PRINCIPAL (DASHBOARD DO USUÁRIO) -->
+  <div id="screen-dashboard" class="hidden min-h-full flex flex-col pb-20">
+    <!-- Header Navbar -->
+    <header class="bg-slate-800/80 backdrop-blur border-b border-slate-700/50 sticky top-0 z-10 px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div id="user-avatar" class="w-9 h-9 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">W</div>
+        <div>
+          <h2 id="user-name" class="font-bold text-white text-sm">Carregando...</h2>
+          <span class="text-xs text-emerald-400 flex items-center gap-1"><i class="fa-solid fa-cloud text-[10px]"></i> Sincronizado na Nuvem</span>
+        </div>
+      </div>
+      <button onclick="logout()" class="text-xs text-slate-400 hover:text-slate-200 bg-slate-700/50 hover:bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-600/30 transition">
+        <i class="fa-solid fa-right-from-bracket mr-1"></i> Sair
+      </button>
+    </header>
+
+    <main class="flex-1 p-4 max-w-lg mx-auto w-full space-y-4">
+
+      <!-- Card do Contador Regressivo até o Natal -->
+      <div class="bg-gradient-to-r from-emerald-900/40 to-slate-800 p-4 rounded-2xl border border-emerald-500/20 relative overflow-hidden">
+        <div class="flex items-center justify-between">
+          <div>
+            <span class="text-xs uppercase font-bold text-emerald-400 tracking-wider">Meta de Natal 🎄</span>
+            <div id="days-countdown" class="text-2xl font-black text-white mt-1">-- dias</div>
+          </div>
+          <div class="text-right">
+            <span class="text-xs text-slate-400">Meta Definida por Você</span>
+            <div id="weekly-rate-display" class="text-sm font-semibold text-emerald-300">-- kg / sem</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resumo de Pesos -->
+      <div class="grid grid-cols-3 gap-3">
+        <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/40 text-center">
+          <span class="text-xs text-slate-400 block">Inicial</span>
+          <span id="weight-initial" class="text-base font-bold text-slate-200">-- kg</span>
+        </div>
+        <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/40 text-center">
+          <span class="text-xs text-slate-400 block">Atual</span>
+          <span id="weight-current" class="text-base font-bold text-emerald-400">-- kg</span>
+        </div>
+        <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/40 text-center">
+          <span class="text-xs text-slate-400 block">Meta Natal</span>
+          <span id="weight-target" class="text-base font-bold text-rose-400">-- kg</span>
+        </div>
+      </div>
+
+      <!-- Ajustar Meta Semanal Personalizada -->
+      <div class="bg-slate-800/60 p-4 rounded-2xl border border-slate-700/40">
+        <h3 class="text-sm font-semibold text-white mb-2 flex items-center">
+          <i class="fa-solid fa-bullseye text-emerald-400 mr-2"></i> Definir Perda Semanal Desejada
+        </h3>
+        <form onsubmit="saveWeeklyGoal(event)" class="flex gap-2">
+          <input type="number" step="0.1" id="input-weekly-goal" placeholder="Ex: 0.8 para 800g" required class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500">
+          <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-4 py-2 rounded-xl text-sm transition">Definir</button>
+        </form>
+      </div>
+
+      <!-- GRÁFICO DE PERDA DE PESO -->
+      <div class="bg-slate-800/60 p-4 rounded-2xl border border-slate-700/40">
+        <h3 class="text-sm font-semibold text-white mb-3 flex items-center">
+          <i class="fa-solid fa-chart-line text-emerald-400 mr-2"></i> Gráfico de Evolução
+        </h3>
+        <div class="relative h-48 w-full">
+          <canvas id="weightChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Formulário Rápido de Registro de Peso -->
+      <div class="bg-slate-800/60 p-4 rounded-2xl border border-slate-700/40">
+        <h3 class="text-sm font-semibold text-white mb-3 flex items-center">
+          <i class="fa-solid fa-weight-scale text-emerald-400 mr-2"></i> Registrar Novo Peso
+        </h3>
+        <form onsubmit="saveWeight(event)" class="flex gap-2">
+          <input type="number" step="0.1" id="input-weight" placeholder="Ex: 85.5" required class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500">
+          <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-4 py-2 rounded-xl text-sm transition">Salvar</button>
+        </form>
+      </div>
+
+      <!-- Registro de Dose da Tirzepatida -->
+      <div class="bg-slate-800/60 p-4 rounded-2xl border border-slate-700/40">
+        <div class="flex justify-between items-center mb-3">
+          <h3 class="text-sm font-semibold text-white flex items-center">
+            <i class="fa-solid fa-syringe text-emerald-400 mr-2"></i> Protocolo Tirzepatida
+          </h3>
+          <span id="dose-label" class="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-md border border-emerald-500/20">Sem Dose</span>
+        </div>
+
+        <form onsubmit="saveDose(event)" class="space-y-3">
+          <div class="grid grid-cols-2 gap-2">
+            <select id="select-dose-mg" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
+              <option value="2.5">2.5 mg</option>
+              <option value="5.0">5.0 mg</option>
+              <option value="7.5">7.5 mg</option>
+              <option value="10.0">10.0 mg</option>
+              <option value="12.5">12.5 mg</option>
+              <option value="15.0">15.0 mg</option>
+            </select>
+            <select id="select-site" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
+              <option value="Abdômen Dir.">Abdômen Dir.</option>
+              <option value="Abdômen Esq.">Abdômen Esq.</option>
+              <option value="Coxa Dir.">Coxa Dir.</option>
+              <option value="Coxa Esq.">Coxa Esq.</option>
+              <option value="Braço">Braço</option>
+            </select>
+          </div>
+          <button type="submit" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2 rounded-xl text-xs transition">
+            Registrar Aplicação da Semana
+          </button>
+        </form>
+
+        <div id="dose-history" class="mt-3 space-y-1.5"></div>
+      </div>
+
+      <!-- Configurações de Meta Inicial -->
+      <details class="bg-slate-800/40 rounded-xl border border-slate-700/30 text-xs">
+        <summary class="p-3 font-medium text-slate-400 cursor-pointer hover:text-slate-200">
+          ⚙️ Ajustar Peso Inicial & Meta de Natal
+        </summary>
+        <div class="p-3 pt-0 space-y-2">
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="text-slate-500 block mb-1">Peso Inicial (kg)</label>
+              <input type="number" step="0.1" id="config-initial" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white">
+            </div>
+            <div>
+              <label class="text-slate-500 block mb-1">Meta Natal (kg)</label>
+              <input type="number" step="0.1" id="config-target" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white">
+            </div>
+          </div>
+          <button onclick="saveConfigs()" class="w-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 py-1.5 rounded-lg font-semibold mt-2">Atualizar Metas</button>
+        </div>
+      </details>
+
+    </main>
+  </div>
+
+  <script>
+    // Configuração do Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyCHRRPhAxp8kaKRd1CbmyBMUPBqObbd9xE",
+      authDomain: "metanatalapp.firebaseapp.com",
+      projectId: "metanatalapp",
+      storageBucket: "metanatalapp.firebasestorage.app",
+      messagingSenderId: "159913382278",
+      appId: "1:159913382278:web:cf747a88f8c420aee51c07",
+      measurementId: "G-V9RS6R5RTD"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let currentUser = null;
+    let userData = { name: '', initial: 0, current: 0, target: 0, weeklyGoal: 0.8, weights: [], doses: [] };
+    let chartInstance = null;
+
+    // Monitorar Autenticação
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        currentUser = user;
+        document.getElementById('screen-auth').classList.add('hidden');
+        document.getElementById('screen-dashboard').classList.remove('hidden');
+        loadUserData();
+      } else {
+        currentUser = null;
+        document.getElementById('screen-auth').classList.remove('hidden');
+        document.getElementById('screen-dashboard').classList.add('hidden');
+      }
+    });
+
+    async function login() {
+      const email = document.getElementById('authEmail').value;
+      const pass = document.getElementById('authPassword').value;
+      document.getElementById('authError').innerText = '';
+
+      try {
+        await auth.signInWithEmailAndPassword(email, pass);
+      } catch (err) {
+        document.getElementById('authError').innerText = 'Falha no login: ' + err.message;
+      }
+    }
+
+    async function register() {
+      const email = document.getElementById('authEmail').value;
+      const pass = document.getElementById('authPassword').value;
+      const name = document.getElementById('authName').value;
+      document.getElementById('authError').innerText = '';
+
+      try {
+        const res = await auth.createUserWithEmailAndPassword(email, pass);
+        await db.collection('users').doc(res.user.uid).set({
+          name: name,
+          initial: name === 'Andressa' ? 75.0 : 95.0,
+          current: name === 'Andressa' ? 75.0 : 95.0,
+          target: name === 'Andressa' ? 65.0 : 82.0,
+          weeklyGoal: name === 'Andressa' ? 0.8 : 0.9,
+          weights: [],
+          doses: []
+        });
+      } catch (err) {
+        document.getElementById('authError').innerText = 'Falha ao registrar: ' + err.message;
+      }
+    }
+
+    function logout() { auth.signOut(); }
+
+    async function loadUserData() {
+      const doc = await db.collection('users').doc(currentUser.uid).get();
+      if (doc.exists) {
+        userData = doc.data();
+        renderDashboard();
+      }
+    }
+
+    function renderDashboard() {
+      document.getElementById('user-name').innerText = userData.name || 'Usuário';
+      document.getElementById('user-avatar').innerText = (userData.name || 'U').charAt(0).toUpperCase();
+
+      const initWeight = userData.initial || 0;
+      const currWeight = userData.current || 0;
+      const targetWeight = userData.target || 0;
+      const weeklyGoal = userData.weeklyGoal || 0.8;
+
+      document.getElementById('weight-initial').innerText = `${initWeight.toFixed(1)} kg`;
+      document.getElementById('weight-current').innerText = `${currWeight.toFixed(1)} kg`;
+      document.getElementById('weight-target').innerText = `${targetWeight.toFixed(1)} kg`;
+      document.getElementById('weekly-rate-display').innerText = `-${weeklyGoal} kg / sem`;
+
+      document.getElementById('config-initial').value = initWeight;
+      document.getElementById('config-target').value = targetWeight;
+      document.getElementById('input-weekly-goal').value = weeklyGoal;
+
+      // Cálculo de Dias até o Natal
+      const today = new Date();
+      const christmas = new Date(today.getFullYear(), 11, 25);
+      if (today > christmas) christmas.setFullYear(christmas.getFullYear() + 1);
+
+      const diffTime = Math.abs(christmas - today);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      document.getElementById('days-countdown').innerText = `${diffDays} dias`;
+
+      // Renderizar Gráfico
+      renderChart();
+
+      // Render Histórico de Doses
+      const historyEl = document.getElementById('dose-history');
+      const doses = userData.doses || [];
+      if (doses.length === 0) {
+        historyEl.innerHTML = `<span class="text-xs text-slate-500 block text-center py-1">Nenhuma aplicação registrada ainda.</span>`;
+        document.getElementById('dose-label').innerText = 'Sem Dose';
+      } else {
+        historyEl.innerHTML = doses.slice(-3).reverse().map(d => `
+          <div class="flex justify-between items-center text-xs bg-slate-900/60 p-2 rounded-lg border border-slate-800">
+            <span class="text-slate-300 font-medium">${d.date} - ${d.mg} mg</span>
+            <span class="text-slate-400">${d.site}</span>
+          </div>
+        `).join('');
+
+        const lastDose = doses[doses.length - 1];
+        document.getElementById('dose-label').innerText = `Dose Atual: ${lastDose.mg} mg`;
+      }
+    }
+
+    function renderChart() {
+      const ctx = document.getElementById('weightChart').getContext('2d');
+      const weights = userData.weights || [];
+
+      const labels = weights.map(w => w.date);
+      const dataPoints = weights.map(w => w.weight);
+
+      if (chartInstance) chartInstance.destroy();
+
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels.length ? labels : ['Início'],
+          datasets: [{
+            label: 'Peso (kg)',
+            data: dataPoints.length ? dataPoints : [userData.current],
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            fill: true,
+            tension: 0.3,
+            pointBackgroundColor: '#10b981'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
+            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }
+          }
+        }
+      });
+    }
+
+    async function saveWeeklyGoal(e) {
+      e.preventDefault();
+      const val = parseFloat(document.getElementById('input-weekly-goal').value);
+      if (!val) return;
+
+      userData.weeklyGoal = val;
+      await db.collection('users').doc(currentUser.uid).update({ weeklyGoal: val });
+      renderDashboard();
+    }
+
+    async function saveWeight(e) {
+      e.preventDefault();
+      const val = parseFloat(document.getElementById('input-weight').value);
+      if (!val) return;
+
+      userData.current = val;
+      if (!userData.weights) userData.weights = [];
+      userData.weights.push({ date: new Date().toLocaleDateString('pt-BR'), weight: val });
+
+      await db.collection('users').doc(currentUser.uid).update({
+        current: userData.current,
+        weights: userData.weights
+      });
+
+      document.getElementById('input-weight').value = '';
+      renderDashboard();
+    }
+
+    async function saveDose(e) {
+      e.preventDefault();
+      const mg = document.getElementById('select-dose-mg').value;
+      const site = document.getElementById('select-site').value;
+
+      if (!userData.doses) userData.doses = [];
+      userData.doses.push({
+        date: new Date().toLocaleDateString('pt-BR'),
+        mg: mg,
+        site: site
+      });
+
+      await db.collection('users').doc(currentUser.uid).update({ doses: userData.doses });
+      renderDashboard();
+    }
+
+    async function saveConfigs() {
+      const initVal = parseFloat(document.getElementById('config-initial').value);
+      const targetVal = parseFloat(document.getElementById('config-target').value);
+
+      if (initVal && targetVal) {
+        userData.initial = initVal;
+        userData.target = targetVal;
+
+        await db.collection('users').doc(currentUser.uid).update({
+          initial: userData.initial,
+          target: userData.target
+        });
+
+        renderDashboard();
+        alert('Metas atualizadas com sucesso!');
+      }
+    }
+  </script>
+</body>
+</html>
