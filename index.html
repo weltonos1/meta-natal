@@ -38,12 +38,12 @@
   <header class="sticky top-0 z-50 glass-card border-b border-slate-800/80 px-4 py-3">
     <div class="max-w-lg mx-auto flex items-center justify-between">
       <div class="flex items-center space-x-3">
-        <div id="user-avatar" class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 flex items-center justify-center font-black text-lg shadow-lg shadow-emerald-500/20">W</div>
+        <div id="user-avatar" class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 flex items-center justify-center font-black text-lg shadow-lg shadow-emerald-500/20 cursor-pointer" onclick="editProfileInfo()" title="Editar dados do perfil">W</div>
         <div>
           <div class="flex items-center gap-2">
             <h2 id="user-name" class="font-bold text-white text-base leading-none">Welton</h2>
             <span id="user-gender-tag" class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">♂ Masc</span>
-            <span id="user-age-tag" class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-800 text-slate-300 border border-slate-700">34 anos</span>
+            <span id="user-age-tag" class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-800 text-slate-300 border border-slate-700 cursor-pointer" onclick="editProfileInfo()" title="Editar idade">34 anos</span>
           </div>
           <span class="text-[11px] text-slate-400 flex items-center gap-1 mt-0.5">
             <span id="sync-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> <span id="sync-status-text">Cloud Sincronizada</span>
@@ -111,7 +111,7 @@
           <button onclick="addWater(500)" class="bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/30 font-bold text-xs px-3 py-2 rounded-xl transition">
             +500ml
           </button>
-          <button onclick="resetWater()" class="bg-slate-800 hover:bg-slate-700 text-slate-400 px-2.5 py-2 rounded-xl text-xs">
+          <button onclick="resetWater()" class="bg-slate-800 hover:bg-slate-700 text-slate-400 px-2.5 py-2 rounded-xl text-xs" title="Zerar água do dia">
             <i class="fa-solid fa-rotate-left"></i>
           </button>
         </div>
@@ -148,7 +148,7 @@
         <span id="weight-current" class="text-sm font-bold text-emerald-400 mt-0.5 block">-- kg</span>
       </div>
       <div class="glass-card p-3 rounded-2xl text-center cursor-pointer hover:border-rose-500/50 transition" onclick="editTargetWeight()" title="Clique para alterar a meta">
-        <span class="text-[10px] text-slate-400 block font-medium uppercase">Meta Natal ✏️</span>
+        <span class="text-[10px] text-slate-400 block font-medium uppercase">Meta Natal ✏️️</span>
         <span id="weight-target" class="text-sm font-bold text-rose-400 mt-0.5 block">-- kg</span>
       </div>
       <div class="glass-card p-3 rounded-2xl text-center">
@@ -222,6 +222,26 @@
           Registrar Aplicação de Dose
         </button>
       </form>
+    </div>
+
+    <!-- HISTÓRICO DE PESAGENS -->
+    <div class="glass-card p-4 rounded-2xl space-y-3">
+      <h3 class="text-xs font-bold text-white flex items-center gap-2 uppercase tracking-wider">
+        <i class="fa-solid fa-list-check text-emerald-400"></i> Histórico de Pesagens
+      </h3>
+      <div id="history-list" class="space-y-2 max-h-40 overflow-y-auto pr-1">
+        <!-- Preenchido via JavaScript -->
+      </div>
+    </div>
+
+    <!-- CONQUISTAS DESBLOQUEADAS -->
+    <div class="glass-card p-4 rounded-2xl space-y-3">
+      <h3 class="text-xs font-bold text-white flex items-center gap-2 uppercase tracking-wider">
+        <i class="fa-solid fa-trophy text-amber-400"></i> Conquistas FitCouple
+      </h3>
+      <div class="grid grid-cols-3 gap-2 text-center" id="badges-container">
+        <!-- Badges dinâmicos -->
+      </div>
     </div>
 
   </main>
@@ -333,7 +353,7 @@
       
       const avatarEl = document.getElementById('user-avatar');
       avatarEl.innerText = data.name.charAt(0);
-      avatarEl.className = `w-10 h-10 rounded-2xl bg-gradient-to-tr ${data.avatarBg} text-slate-950 flex items-center justify-center font-black text-lg shadow-lg`;
+      avatarEl.className = `w-10 h-10 rounded-2xl bg-gradient-to-tr ${data.avatarBg} text-slate-950 flex items-center justify-center font-black text-lg shadow-lg cursor-pointer`;
 
       if(profileName === 'Welton') {
         document.getElementById('btn-welton').className = "px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-emerald-500 text-slate-950 shadow";
@@ -345,6 +365,8 @@
 
       updateMetrics();
       renderChart();
+      renderHistory();
+      renderBadges();
     }
 
     function updateMetrics() {
@@ -436,6 +458,19 @@
       }
     }
 
+    function editProfileInfo() {
+      const data = profilesData[currentProfile];
+      const ageVal = prompt('Idade:', data.age);
+      const heightVal = prompt('Altura (ex: 1.78):', data.height);
+      
+      if(ageVal !== null && heightVal !== null) {
+        data.age = parseInt(ageVal) || data.age;
+        data.height = parseFloat(heightVal.replace(',', '.')) || data.height;
+        switchProfile(currentProfile);
+        saveProfileToCloud(currentProfile);
+      }
+    }
+
     function addWater(amount) {
       const data = profilesData[currentProfile];
       data.waterCurrent += amount;
@@ -465,66 +500,15 @@
       document.getElementById('input-weight').value = '';
       updateMetrics();
       renderChart();
+      renderHistory();
+      renderBadges();
       saveProfileToCloud(currentProfile);
     }
 
-    function saveDose(event) {
-      event.preventDefault();
+    function renderHistory() {
       const data = profilesData[currentProfile];
-      data.doseMg = document.getElementById('select-dose-mg').value;
-      data.lastDoseDate = document.getElementById('input-dose-date').value;
-      updateMetrics();
-      saveProfileToCloud(currentProfile);
-      alert('Protocolo de dose atualizado e salvo na nuvem com sucesso!');
-    }
+      const container = document.getElementById('history-list');
+      container.innerHTML = '';
 
-    function renderChart() {
-      const data = profilesData[currentProfile];
-      const ctx = document.getElementById('weightChart').getContext('2d');
-
-      if(weightChartInstance) {
-        weightChartInstance.destroy();
-      }
-
-      weightChartInstance = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: data.history.map(item => item.date),
-          datasets: [{
-            label: 'Peso (kg)',
-            data: data.history.map(item => item.weight),
-            borderColor: currentProfile === 'Welton' ? '#10b981' : '#ec4899',
-            backgroundColor: currentProfile === 'Welton' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(236, 72, 153, 0.1)',
-            borderWidth: 3,
-            fill: true,
-            tension: 0.3,
-            pointRadius: 4,
-            pointBackgroundColor: currentProfile === 'Welton' ? '#10b981' : '#ec4899'
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false }
-          },
-          scales: {
-            x: {
-              grid: { color: 'rgba(255, 255, 255, 0.05)' },
-              ticks: { color: '#64748b', font: { size: 10 } }
-            },
-            y: {
-              grid: { color: 'rgba(255, 255, 255, 0.05)' },
-              ticks: { color: '#64748b', font: { size: 10 } }
-            }
-          }
-        }
-      });
-    }
-
-    window.onload = () => {
-      loadDataFromCloud();
-    };
-  </script>
-</body>
-</html>
+      if(!data.history || data.history.length === 0) {
+        container.innerHTML = '<span class="text-xs
