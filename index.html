@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="h-full bg-slate-900 text-slate-100">
+<html lang="pt-BR" class="h-full bg-slate-950 text-slate-100">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Meta Natal - Emagrecimento em Casal Cloud</title>
+  <title>FitCouple Pro - Meta Natal 🎄</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
@@ -14,110 +14,148 @@
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-  <meta name="theme-color" content="#0f172a">
+  <meta name="theme-color" content="#020617">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <style>
+    /* Custom Scrollbar & Transitions */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #020617; }
+    ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+  </style>
 </head>
-<body class="h-full font-sans antialiased selection:bg-emerald-500 selection:text-white">
+<body class="h-full font-sans antialiased selection:bg-emerald-500 selection:text-white pb-24">
 
-  <!-- TELA PRINCIPAL (DASHBOARD DO USUÁRIO) -->
-  <div id="screen-dashboard" class="min-h-full flex flex-col pb-20">
-    <!-- Header Navbar -->
-    <header class="bg-slate-800/80 backdrop-blur border-b border-slate-700/50 sticky top-0 z-10 px-4 py-3 flex items-center justify-between">
+  <!-- HEADER NAVBAR -->
+  <header class="sticky top-0 z-50 glass-card border-b border-slate-800/80 px-4 py-3">
+    <div class="max-w-lg mx-auto flex items-center justify-between">
       <div class="flex items-center space-x-3">
-        <div id="user-avatar" class="w-9 h-9 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">W</div>
+        <div id="user-avatar" class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 flex items-center justify-center font-black text-lg shadow-lg shadow-emerald-500/20">W</div>
         <div>
-          <h2 id="user-name" class="font-bold text-white text-sm">Carregando...</h2>
-          <span class="text-xs text-emerald-400 flex items-center gap-1"><i class="fa-solid fa-cloud text-[10px]"></i> Sincronizado na Nuvem</span>
+          <div class="flex items-center gap-2">
+            <h2 id="user-name" class="font-bold text-white text-base leading-none">Welton</h2>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Pro</span>
+          </div>
+          <span class="text-[11px] text-slate-400 flex items-center gap-1 mt-0.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Cloud Sincronizado
+          </span>
         </div>
       </div>
-      <!-- Alternador de Perfil direto no Header -->
-      <div class="flex items-center gap-2">
-        <button onclick="switchProfile('Welton')" id="btn-welton" class="text-xs px-3 py-1.5 rounded-lg border font-semibold transition bg-emerald-500/20 border-emerald-500/40 text-emerald-300">
-          Welton
+
+      <!-- ALTERNADOR DE PERFIL -->
+      <div class="flex items-center bg-slate-900/90 p-1 rounded-xl border border-slate-800">
+        <button onclick="switchProfile('Welton')" id="btn-welton" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all">
+          ⚡ Welton
         </button>
-        <button onclick="switchProfile('Andressa')" id="btn-andressa" class="text-xs px-3 py-1.5 rounded-lg border font-semibold transition bg-slate-800 border-slate-700 text-slate-400 hover:text-white">
-          Andressa
+        <button onclick="switchProfile('Andressa')" id="btn-andressa" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all">
+          🌸 Andressa
         </button>
       </div>
-    </header>
+    </div>
+  </header>
 
-    <main class="flex-1 p-4 max-w-lg mx-auto w-full space-y-4">
+  <main class="max-w-lg mx-auto p-4 space-y-4">
 
-      <!-- Card do Contador Regressivo até o Natal -->
-      <div class="bg-gradient-to-r from-emerald-900/40 to-slate-800 p-4 rounded-2xl border border-emerald-500/20 relative overflow-hidden">
-        <div class="flex items-center justify-between">
+    <!-- HERO CARD: CONTADOR DE NATAL & PROGRESSO -->
+    <div class="glass-card p-5 rounded-3xl relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-900/90 to-emerald-950/40">
+      <div class="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
+      
+      <div class="flex justify-between items-start mb-4">
+        <div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+            <i class="fa-solid fa-tree"></i> Meta de Natal
+          </span>
+          <h3 id="days-countdown" class="text-3xl font-black text-white mt-1">-- dias</h3>
+        </div>
+        <div class="text-right">
+          <span class="text-[11px] text-slate-400 block">Ritmo Planejado</span>
+          <span id="weekly-rate-display" class="text-base font-bold text-emerald-300">-0.8 kg/sem</span>
+        </div>
+      </div>
+
+      <!-- BARRA DE PROGRESSO DA META -->
+      <div class="space-y-1.5">
+        <div class="flex justify-between text-xs font-semibold">
+          <span class="text-slate-400">Progresso do Objetivo</span>
+          <span id="progress-percent" class="text-emerald-400">0%</span>
+        </div>
+        <div class="w-full bg-slate-800 rounded-full h-3 p-0.5 overflow-hidden border border-slate-700/50">
+          <div id="progress-bar" class="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARDS DE MÉTRICAS RÁPIDAS (4 GRID) -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+      <div class="glass-card p-3 rounded-2xl text-center">
+        <span class="text-[10px] text-slate-400 block font-medium uppercase">Inicial</span>
+        <span id="weight-initial" class="text-sm font-bold text-slate-200 mt-0.5 block">-- kg</span>
+      </div>
+      <div class="glass-card p-3 rounded-2xl text-center border-emerald-500/30">
+        <span class="text-[10px] text-slate-400 block font-medium uppercase">Atual</span>
+        <span id="weight-current" class="text-sm font-bold text-emerald-400 mt-0.5 block">-- kg</span>
+      </div>
+      <div class="glass-card p-3 rounded-2xl text-center">
+        <span class="text-[10px] text-slate-400 block font-medium uppercase">Meta Natal</span>
+        <span id="weight-target" class="text-sm font-bold text-rose-400 mt-0.5 block">-- kg</span>
+      </div>
+      <div class="glass-card p-3 rounded-2xl text-center">
+        <span class="text-[10px] text-slate-400 block font-medium uppercase">Eliminado</span>
+        <span id="weight-lost" class="text-sm font-bold text-teal-300 mt-0.5 block">0.0 kg</span>
+      </div>
+    </div>
+
+    <!-- REGISTRAR NOVO PESO & META SEMANAL -->
+    <div class="glass-card p-4 rounded-2xl space-y-3">
+      <div class="flex justify-between items-center">
+        <h3 class="text-xs font-bold text-white flex items-center gap-2 uppercase tracking-wider">
+          <i class="fa-solid fa-weight-scale text-emerald-400"></i> Registar Pesagem
+        </h3>
+        <span class="text-[11px] text-slate-400" id="last-update-date">Hoje</span>
+      </div>
+
+      <form onsubmit="saveWeight(event)" class="flex gap-2">
+        <input type="number" step="0.1" id="input-weight" placeholder="Ex: 84.5 kg" required class="flex-1 bg-slate-900/90 border border-slate-700/80 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500">
+        <button type="submit" class="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-slate-950 font-bold px-5 py-2.5 rounded-xl text-sm transition shadow-lg shadow-emerald-500/10">
+          Salvar
+        </button>
+      </form>
+    </div>
+
+    <!-- GRÁFICO DE EVOLUÇÃO COMPLETO -->
+    <div class="glass-card p-4 rounded-2xl space-y-3">
+      <div class="flex justify-between items-center">
+        <h3 class="text-xs font-bold text-white flex items-center gap-2 uppercase tracking-wider">
+          <i class="fa-solid fa-chart-line text-emerald-400"></i> Evolução de Peso
+        </h3>
+      </div>
+      <div class="relative h-52 w-full">
+        <canvas id="weightChart"></canvas>
+      </div>
+    </div>
+
+    <!-- PROTOCOLO TIRZEPATIDA & DOSES -->
+    <div class="glass-card p-4 rounded-2xl space-y-3">
+      <div class="flex justify-between items-center">
+        <h3 class="text-xs font-bold text-white flex items-center gap-2 uppercase tracking-wider">
+          <i class="fa-solid fa-syringe text-emerald-400"></i> Protocolo Tirzepatida
+        </h3>
+        <span id="dose-label" class="text-[10px] font-bold bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-lg border border-emerald-500/20">
+          Dose Atual: --
+        </span>
+      </div>
+
+      <form onsubmit="saveDose(event)" class="space-y-2.5">
+        <div class="grid grid-cols-2 gap-2">
           <div>
-            <span class="text-xs uppercase font-bold text-emerald-400 tracking-wider">Meta de Natal 🎄</span>
-            <div id="days-countdown" class="text-2xl font-black text-white mt-1">-- dias</div>
-          </div>
-          <div class="text-right">
-            <span class="text-xs text-slate-400">Meta Definida por Você</span>
-            <div id="weekly-rate-display" class="text-sm font-semibold text-emerald-300">-- kg / sem</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Resumo de Pesos -->
-      <div class="grid grid-cols-3 gap-3">
-        <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/40 text-center">
-          <span class="text-xs text-slate-400 block">Inicial</span>
-          <span id="weight-initial" class="text-base font-bold text-slate-200">-- kg</span>
-        </div>
-        <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/40 text-center">
-          <span class="text-xs text-slate-400 block">Atual</span>
-          <span id="weight-current" class="text-base font-bold text-emerald-400">-- kg</span>
-        </div>
-        <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/40 text-center">
-          <span class="text-xs text-slate-400 block">Meta Natal</span>
-          <span id="weight-target" class="text-base font-bold text-rose-400">-- kg</span>
-        </div>
-      </div>
-
-      <!-- Ajustar Meta Semanal Personalizada -->
-      <div class="bg-slate-800/60 p-4 rounded-2xl border border-slate-700/40">
-        <h3 class="text-sm font-semibold text-white mb-2 flex items-center">
-          <i class="fa-solid fa-bullseye text-emerald-400 mr-2"></i> Definir Perda Semanal Desejada
-        </h3>
-        <form onsubmit="saveWeeklyGoal(event)" class="flex gap-2">
-          <input type="number" step="0.1" id="input-weekly-goal" placeholder="Ex: 0.8 para 800g" required class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500">
-          <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-4 py-2 rounded-xl text-sm transition">Definir</button>
-        </form>
-      </div>
-
-      <!-- GRÁFICO DE PERDA DE PESO -->
-      <div class="bg-slate-800/60 p-4 rounded-2xl border border-slate-700/40">
-        <h3 class="text-sm font-semibold text-white mb-3 flex items-center">
-          <i class="fa-solid fa-chart-line text-emerald-400 mr-2"></i> Gráfico de Evolução
-        </h3>
-        <div class="relative h-48 w-full">
-          <canvas id="weightChart"></canvas>
-        </div>
-      </div>
-
-      <!-- Formulário Rápido de Registro de Peso -->
-      <div class="bg-slate-800/60 p-4 rounded-2xl border border-slate-700/40">
-        <h3 class="text-sm font-semibold text-white mb-3 flex items-center">
-          <i class="fa-solid fa-weight-scale text-emerald-400 mr-2"></i> Registrar Novo Peso
-        </h3>
-        <form onsubmit="saveWeight(event)" class="flex gap-2">
-          <input type="number" step="0.1" id="input-weight" placeholder="Ex: 85.5" required class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500">
-          <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-4 py-2 rounded-xl text-sm transition">Salvar</button>
-        </form>
-      </div>
-
-      <!-- Registro de Dose da Tirzepatida -->
-      <div class="bg-slate-800/60 p-4 rounded-2xl border border-slate-700/40">
-        <div class="flex justify-between items-center mb-3">
-          <h3 class="text-sm font-semibold text-white flex items-center">
-            <i class="fa-solid fa-syringe text-emerald-400 mr-2"></i> Protocolo Tirzepatida
-          </h3>
-          <span id="dose-label" class="text-xs bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-md border border-emerald-500/20">Sem Dose</span>
-        </div>
-
-        <form onsubmit="saveDose(event)" class="space-y-3">
-          <div class="grid grid-cols-2 gap-2">
-            <select id="select-dose-mg" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
+            <label class="text-[10px] font-semibold text-slate-400 block mb-1">Dose (mg)</label>
+            <select id="select-dose-mg" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
               <option value="2.5">2.5 mg</option>
               <option value="5.0">5.0 mg</option>
               <option value="7.5">7.5 mg</option>
@@ -125,7 +163,10 @@
               <option value="12.5">12.5 mg</option>
               <option value="15.0">15.0 mg</option>
             </select>
-            <select id="select-site" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
+          </div>
+          <div>
+            <label class="text-[10px] font-semibold text-slate-400 block mb-1">Local de Aplicação</label>
+            <select id="select-site" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
               <option value="Abdômen Dir.">Abdômen Dir.</option>
               <option value="Abdômen Esq.">Abdômen Esq.</option>
               <option value="Coxa Dir.">Coxa Dir.</option>
@@ -133,39 +174,55 @@
               <option value="Braço">Braço</option>
             </select>
           </div>
-          <button type="submit" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2 rounded-xl text-xs transition">
-            Registrar Aplicação da Semana
-          </button>
-        </form>
-
-        <div id="dose-history" class="mt-3 space-y-1.5"></div>
-      </div>
-
-      <!-- Configurações de Meta Inicial -->
-      <details class="bg-slate-800/40 rounded-xl border border-slate-700/30 text-xs">
-        <summary class="p-3 font-medium text-slate-400 cursor-pointer hover:text-slate-200">
-          ⚙️ Ajustar Peso Inicial & Meta de Natal
-        </summary>
-        <div class="p-3 pt-0 space-y-2">
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="text-slate-500 block mb-1">Peso Inicial (kg)</label>
-              <input type="number" step="0.1" id="config-initial" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white">
-            </div>
-            <div>
-              <label class="text-slate-500 block mb-1">Meta Natal (kg)</label>
-              <input type="number" step="0.1" id="config-target" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white">
-            </div>
-          </div>
-          <button onclick="saveConfigs()" class="w-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 py-1.5 rounded-lg font-semibold mt-2">Atualizar Metas</button>
         </div>
-      </details>
+        <button type="submit" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/60 font-semibold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-plus text-emerald-400"></i> Registrar Aplicação Semanal
+        </button>
+      </form>
 
-    </main>
-  </div>
+      <!-- HISTÓRICO DE DOSES COM BOTÃO DE EXCLUIR -->
+      <div id="dose-history" class="space-y-1.5 pt-1"></div>
+    </div>
+
+    <!-- TABELA DE HISTÓRICO DE PESO COM EXCLUSÃO REAL -->
+    <div class="glass-card p-4 rounded-2xl space-y-3">
+      <h3 class="text-xs font-bold text-white flex items-center gap-2 uppercase tracking-wider">
+        <i class="fa-solid fa-list-check text-emerald-400"></i> Histórico de Pesagens
+      </h3>
+      <div id="weight-history-list" class="max-h-48 overflow-y-auto space-y-2 pr-1"></div>
+    </div>
+
+    <!-- CONFIGURAÇÕES DE METAS & PERFIL -->
+    <details class="glass-card rounded-2xl text-xs">
+      <summary class="p-4 font-bold text-slate-300 cursor-pointer flex justify-between items-center hover:text-white">
+        <span>⚙️ Configurar Metas & Objetivos</span>
+        <i class="fa-solid fa-chevron-down text-slate-500 text-xs"></i>
+      </summary>
+      <div class="p-4 pt-0 space-y-3 border-t border-slate-800/60 mt-2">
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="text-slate-400 block mb-1">Peso Inicial (kg)</label>
+            <input type="number" step="0.1" id="config-initial" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white">
+          </div>
+          <div>
+            <label class="text-slate-400 block mb-1">Meta Natal (kg)</label>
+            <input type="number" step="0.1" id="config-target" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white">
+          </div>
+        </div>
+        <div>
+          <label class="text-slate-400 block mb-1">Ritmo Semanal Desejado (kg)</label>
+          <input type="number" step="0.1" id="config-weekly" placeholder="Ex: 0.8" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white">
+        </div>
+        <button onclick="saveConfigs()" class="w-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 py-2.5 rounded-xl font-bold hover:bg-emerald-500/30 transition">
+          Atualizar Parâmetros
+        </button>
+      </div>
+    </details>
+
+  </main>
 
   <script>
-    // Configuração do Firebase
+    // CONFIGURAÇÃO DO FIREBASE (NUVEM FIRESTORE)
     const firebaseConfig = {
       apiKey: "AIzaSyCHRRPhAxp8kaKRd1CbmyBMUPBqObbd9xE",
       authDomain: "metanatalapp.firebaseapp.com",
@@ -193,28 +250,27 @@
       loadUserData(profileName);
     }
 
-    function updateHeaderButtons() {
+    function updateProfileUI() {
       const btnWelton = document.getElementById('btn-welton');
       const btnAndressa = document.getElementById('btn-andressa');
 
       if (activeProfile === 'Welton') {
-        btnWelton.className = "text-xs px-3 py-1.5 rounded-lg border font-semibold transition bg-emerald-500/20 border-emerald-500/40 text-emerald-300";
-        btnAndressa.className = "text-xs px-3 py-1.5 rounded-lg border font-semibold transition bg-slate-800 border-slate-700 text-slate-400 hover:text-white";
+        btnWelton.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20";
+        btnAndressa.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white";
       } else {
-        btnAndressa.className = "text-xs px-3 py-1.5 rounded-lg border font-semibold transition bg-rose-500/20 border-rose-500/40 text-rose-300";
-        btnWelton.className = "text-xs px-3 py-1.5 rounded-lg border font-semibold transition bg-slate-800 border-slate-700 text-slate-400 hover:text-white";
+        btnAndressa.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-rose-500 text-slate-950 shadow-md shadow-rose-500/20";
+        btnWelton.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white";
       }
     }
 
     async function loadUserData(profileName) {
-      updateHeaderButtons();
+      updateProfileUI();
       const docRef = db.collection('profiles').doc(profileName.toLowerCase());
       const doc = await docRef.get();
 
       if (doc.exists) {
         userData = doc.data();
       } else {
-        // Criar perfil padrão na nuvem caso não exista
         userData = {
           initial: profileName === 'Andressa' ? 75.0 : 95.0,
           current: profileName === 'Andressa' ? 75.0 : 95.0,
@@ -240,13 +296,26 @@
       document.getElementById('weight-initial').innerText = `${initWeight.toFixed(1)} kg`;
       document.getElementById('weight-current').innerText = `${currWeight.toFixed(1)} kg`;
       document.getElementById('weight-target').innerText = `${targetWeight.toFixed(1)} kg`;
-      document.getElementById('weekly-rate-display').innerText = `-${weeklyGoal} kg / sem`;
+      document.getElementById('weekly-rate-display').innerText = `-${weeklyGoal} kg/sem`;
+
+      const lostKg = (initWeight - currWeight).toFixed(1);
+      document.getElementById('weight-lost').innerText = lostKg > 0 ? `-${lostKg} kg` : `${Math.abs(lostKg)} kg`;
+
+      // CÁLCULO DE PROGRESSO EM PERCENTUAL
+      const totalToLose = initWeight - targetWeight;
+      const currentLost = initWeight - currWeight;
+      let percent = 0;
+      if (totalToLose > 0) {
+        percent = Math.min(Math.max((currentLost / totalToLose) * 100, 0), 100).toFixed(0);
+      }
+      document.getElementById('progress-percent').innerText = `${percent}%`;
+      document.getElementById('progress-bar').style.width = `${percent}%`;
 
       document.getElementById('config-initial').value = initWeight;
       document.getElementById('config-target').value = targetWeight;
-      document.getElementById('input-weekly-goal').value = weeklyGoal;
+      document.getElementById('config-weekly').value = weeklyGoal;
 
-      // Cálculo de Dias até o Natal
+      // CÁLCULO DE DIAS ATÉ O NATAL
       const today = new Date();
       const christmas = new Date(today.getFullYear(), 11, 25);
       if (today > christmas) christmas.setFullYear(christmas.getFullYear() + 1);
@@ -256,24 +325,7 @@
       document.getElementById('days-countdown').innerText = `${diffDays} dias`;
 
       renderChart();
-
-      // Render Histórico de Doses
-      const historyEl = document.getElementById('dose-history');
-      const doses = userData.doses || [];
-      if (doses.length === 0) {
-        historyEl.innerHTML = `<span class="text-xs text-slate-500 block text-center py-1">Nenhuma aplicação registrada ainda.</span>`;
-        document.getElementById('dose-label').innerText = 'Sem Dose';
-      } else {
-        historyEl.innerHTML = doses.slice(-3).reverse().map(d => `
-          <div class="flex justify-between items-center text-xs bg-slate-900/60 p-2 rounded-lg border border-slate-800">
-            <span class="text-slate-300 font-medium">${d.date} - ${d.mg} mg</span>
-            <span class="text-slate-400">${d.site}</span>
-          </div>
-        `).join('');
-
-        const lastDose = doses[doses.length - 1];
-        document.getElementById('dose-label').innerText = `Dose Atual: ${lastDose.mg} mg`;
-      }
+      renderHistoryLists();
     }
 
     function renderChart() {
@@ -285,8 +337,10 @@
 
       if (chartInstance) chartInstance.destroy();
 
-      const mainColor = activeProfile === 'Andressa' ? '#f43f5e' : '#10b981';
-      const bgColor = activeProfile === 'Andressa' ? 'rgba(244, 63, 94, 0.1)' : 'rgba(16, 185, 129, 0.1)';
+      const color = activeProfile === 'Andressa' ? '#f43f5e' : '#10b981';
+      const bgGradient = ctx.createLinearGradient(0, 0, 0, 200);
+      bgGradient.addColorStop(0, activeProfile === 'Andressa' ? 'rgba(244, 63, 94, 0.25)' : 'rgba(16, 185, 129, 0.25)');
+      bgGradient.addColorStop(1, 'rgba(15, 23, 42, 0)');
 
       chartInstance = new Chart(ctx, {
         type: 'line',
@@ -295,11 +349,15 @@
           datasets: [{
             label: 'Peso (kg)',
             data: dataPoints.length ? dataPoints : [userData.current],
-            borderColor: mainColor,
-            backgroundColor: bgColor,
+            borderColor: color,
+            borderWidth: 3,
+            backgroundColor: bgGradient,
             fill: true,
-            tension: 0.3,
-            pointBackgroundColor: mainColor
+            tension: 0.35,
+            pointBackgroundColor: color,
+            pointBorderColor: '#020617',
+            pointBorderWidth: 2,
+            pointRadius: 5
           }]
         },
         options: {
@@ -307,21 +365,59 @@
           maintainAspectRatio: false,
           plugins: { legend: { display: false } },
           scales: {
-            x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
-            y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }
+            x: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#64748b', font: { size: 10 } } },
+            y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#64748b', font: { size: 10 } } }
           }
         }
       });
     }
 
-    async function saveWeeklyGoal(e) {
-      e.preventDefault();
-      const val = parseFloat(document.getElementById('input-weekly-goal').value);
-      if (!val) return;
+    function renderHistoryLists() {
+      // RENDEREIZAR HISTÓRICO DE PESO
+      const historyList = document.getElementById('weight-history-list');
+      const weights = userData.weights || [];
+      if (weights.length === 0) {
+        historyList.innerHTML = `<span class="text-xs text-slate-500 block text-center py-2">Sem pesagens registadas.</span>`;
+      } else {
+        historyList.innerHTML = weights.slice().reverse().map((w, index) => {
+          const realIndex = weights.length - 1 - index;
+          return `
+            <div class="flex justify-between items-center text-xs bg-slate-900/80 p-2.5 rounded-xl border border-slate-800/80">
+              <span class="text-slate-400 font-medium">${w.date}</span>
+              <span class="text-white font-bold">${w.weight.toFixed(1)} kg</span>
+              <button onclick="deleteWeight(${realIndex})" class="text-rose-400 hover:text-rose-300 p-1">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </div>
+          `;
+        }).join('');
+      }
 
-      userData.weeklyGoal = val;
-      await db.collection('profiles').doc(activeProfile.toLowerCase()).update({ weeklyGoal: val });
-      renderDashboard();
+      // RENDERIZAR HISTÓRICO DE DOSES
+      const doseHistoryEl = document.getElementById('dose-history');
+      const doses = userData.doses || [];
+      if (doses.length === 0) {
+        doseHistoryEl.innerHTML = `<span class="text-xs text-slate-500 block text-center py-1">Nenhuma aplicação registrada.</span>`;
+        document.getElementById('dose-label').innerText = 'Sem Dose';
+      } else {
+        doseHistoryEl.innerHTML = doses.slice(-3).reverse().map((d, index) => {
+          const realIndex = doses.length - 1 - index;
+          return `
+            <div class="flex justify-between items-center text-xs bg-slate-900/80 p-2 rounded-xl border border-slate-800">
+              <span class="text-slate-300 font-semibold">${d.date} - ${d.mg} mg</span>
+              <div class="flex items-center gap-2">
+                <span class="text-slate-400">${d.site}</span>
+                <button onclick="deleteDose(${realIndex})" class="text-rose-400 hover:text-rose-300">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        const lastDose = doses[doses.length - 1];
+        document.getElementById('dose-label').innerText = `Dose Atual: ${lastDose.mg} mg`;
+      }
     }
 
     async function saveWeight(e) {
@@ -342,6 +438,21 @@
       renderDashboard();
     }
 
+    async function deleteWeight(index) {
+      userData.weights.splice(index, 1);
+      if (userData.weights.length > 0) {
+        userData.current = userData.weights[userData.weights.length - 1].weight;
+      } else {
+        userData.current = userData.initial;
+      }
+
+      await db.collection('profiles').doc(activeProfile.toLowerCase()).update({
+        current: userData.current,
+        weights: userData.weights
+      });
+      renderDashboard();
+    }
+
     async function saveDose(e) {
       e.preventDefault();
       const mg = document.getElementById('select-dose-mg').value;
@@ -358,21 +469,30 @@
       renderDashboard();
     }
 
+    async function deleteDose(index) {
+      userData.doses.splice(index, 1);
+      await db.collection('profiles').doc(activeProfile.toLowerCase()).update({ doses: userData.doses });
+      renderDashboard();
+    }
+
     async function saveConfigs() {
       const initVal = parseFloat(document.getElementById('config-initial').value);
       const targetVal = parseFloat(document.getElementById('config-target').value);
+      const weeklyVal = parseFloat(document.getElementById('config-weekly').value);
 
       if (initVal && targetVal) {
         userData.initial = initVal;
         userData.target = targetVal;
+        userData.weeklyGoal = weeklyVal || 0.8;
 
         await db.collection('profiles').doc(activeProfile.toLowerCase()).update({
           initial: userData.initial,
-          target: userData.target
+          target: userData.target,
+          weeklyGoal: userData.weeklyGoal
         });
 
         renderDashboard();
-        alert('Metas atualizadas com sucesso!');
+        alert('Metas e parâmetros atualizados com sucesso!');
       }
     }
   </script>
