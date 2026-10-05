@@ -43,7 +43,7 @@
           <div class="flex items-center gap-2">
             <h2 id="user-name" class="font-bold text-white text-base leading-none">Welton</h2>
             <span id="user-gender-tag" class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">♂ Masc</span>
-            <span id="user-age-tag" class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-800 text-slate-300 border border-slate-700">-- anos</span>
+            <span id="user-age-tag" class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-800 text-slate-300 border border-slate-700">34 anos</span>
           </div>
           <span class="text-[11px] text-slate-400 flex items-center gap-1 mt-0.5">
             <span id="sync-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> <span id="sync-status-text">Cloud Sincronizada</span>
@@ -101,7 +101,7 @@
           </span>
           <div class="flex items-baseline gap-1 mt-0.5">
             <span id="water-current-text" class="text-xl font-black text-white">0</span>
-            <span class="text-xs text-slate-400">/ <span id="water-target-text">2500</span> ml</span>
+            <span class="text-xs text-slate-400">/ <span id="water-target-text">3000</span> ml</span>
           </div>
         </div>
         <div class="flex gap-1.5">
@@ -228,7 +228,6 @@
 
   <!-- FIREBASE & APP LOGIC SCRIPT -->
   <script>
-    // Configuração do Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyD2h00k9tpu9K7sx2jBMTFqGBbbp5s",
       authDomain: "metanatalapp.firebaseapp.com",
@@ -246,7 +245,6 @@
     let currentProfile = 'Welton';
     let weightChartInstance = null;
 
-    // Dados padrão caso o Firestore esteja vazio
     let profilesData = {
       Welton: {
         name: 'Welton',
@@ -288,18 +286,17 @@
       }
     };
 
-    // Sincronizar dados do Firestore ao carregar
     async function loadDataFromCloud() {
       try {
         const weltonDoc = await db.collection('profiles').doc('Welton').get();
-        if (weltonDoc.exists) {
+        if (weltonDoc.exists && weltonDoc.data().currentWeight) {
           profilesData.Welton = weltonDoc.data();
         } else {
           await db.collection('profiles').doc('Welton').set(profilesData.Welton);
         }
 
         const andressaDoc = await db.collection('profiles').doc('Andressa').get();
-        if (andressaDoc.exists) {
+        if (andressaDoc.exists && andressaDoc.data().currentWeight) {
           profilesData.Andressa = andressaDoc.data();
         } else {
           await db.collection('profiles').doc('Andressa').set(profilesData.Andressa);
@@ -308,13 +305,12 @@
         switchProfile(currentProfile);
       } catch (error) {
         console.error("Erro ao carregar do Firestore:", error);
-        document.getElementById('sync-status-text').innerText = "Modo Local (Offline)";
+        document.getElementById('sync-status-text').innerText = "Modo Local";
         document.getElementById('sync-dot').className = "w-1.5 h-1.5 rounded-full bg-amber-400";
         switchProfile(currentProfile);
       }
     }
 
-    // Salvar perfil ativo no Firestore
     async function saveProfileToCloud(profileName) {
       try {
         await db.collection('profiles').doc(profileName).set(profilesData[profileName]);
@@ -496,7 +492,6 @@
       });
     }
 
-    // Initialize application on load
     window.onload = () => {
       loadDataFromCloud();
     };
