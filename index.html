@@ -12,7 +12,6 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <meta name="theme-color" content="#0f172a">
@@ -21,50 +20,8 @@
 </head>
 <body class="h-full font-sans antialiased selection:bg-emerald-500 selection:text-white">
 
-  <!-- TELA DE AUTENTICAÇÃO / LOGIN -->
-  <div id="screen-auth" class="min-h-full flex flex-col justify-center items-center p-6 text-center">
-    <div class="max-w-md w-full space-y-6 bg-slate-800/80 p-6 rounded-2xl border border-slate-700/50 shadow-2xl backdrop-blur">
-      <div>
-        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500/10 text-emerald-400 mb-3 ring-1 ring-emerald-500/20">
-          <i class="fa-solid fa-scale-balanced text-2xl"></i>
-        </div>
-        <h1 class="text-2xl font-extrabold tracking-tight text-white">Meta até o Natal 🎄</h1>
-        <p class="mt-1 text-xs text-slate-400">Acesse sua conta para sincronizar dados na nuvem</p>
-      </div>
-
-      <div class="space-y-3 text-left">
-        <div>
-          <label class="text-xs font-semibold text-slate-400 block mb-1">E-mail</label>
-          <input type="email" id="authEmail" placeholder="seuemail@exemplo.com" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
-        </div>
-        <div>
-          <label class="text-xs font-semibold text-slate-400 block mb-1">Senha</label>
-          <input type="password" id="authPassword" placeholder="******" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
-        </div>
-        <div>
-          <label class="text-xs font-semibold text-slate-400 block mb-1">Selecione o Usuário (Para novo cadastro)</label>
-          <select id="authName" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
-            <option value="Welton">Welton</option>
-            <option value="Andressa">Andressa</option>
-          </select>
-        </div>
-      </div>
-
-      <p id="authError" class="text-xs text-rose-400 min-h-[1rem]"></p>
-
-      <div class="flex flex-col gap-2">
-        <button onclick="login()" class="w-full py-2.5 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-sm transition">
-          <i class="fa-solid fa-right-to-bracket mr-2"></i> Entrar
-        </button>
-        <button onclick="register()" class="w-full py-2.5 px-4 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-medium text-sm transition">
-          Criar Nova Conta
-        </button>
-      </div>
-    </div>
-  </div>
-
   <!-- TELA PRINCIPAL (DASHBOARD DO USUÁRIO) -->
-  <div id="screen-dashboard" class="hidden min-h-full flex flex-col pb-20">
+  <div id="screen-dashboard" class="min-h-full flex flex-col pb-20">
     <!-- Header Navbar -->
     <header class="bg-slate-800/80 backdrop-blur border-b border-slate-700/50 sticky top-0 z-10 px-4 py-3 flex items-center justify-between">
       <div class="flex items-center space-x-3">
@@ -74,9 +31,15 @@
           <span class="text-xs text-emerald-400 flex items-center gap-1"><i class="fa-solid fa-cloud text-[10px]"></i> Sincronizado na Nuvem</span>
         </div>
       </div>
-      <button onclick="logout()" class="text-xs text-slate-400 hover:text-slate-200 bg-slate-700/50 hover:bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-600/30 transition">
-        <i class="fa-solid fa-right-from-bracket mr-1"></i> Sair
-      </button>
+      <!-- Alternador de Perfil direto no Header -->
+      <div class="flex items-center gap-2">
+        <button onclick="switchProfile('Welton')" id="btn-welton" class="text-xs px-3 py-1.5 rounded-lg border font-semibold transition bg-emerald-500/20 border-emerald-500/40 text-emerald-300">
+          Welton
+        </button>
+        <button onclick="switchProfile('Andressa')" id="btn-andressa" class="text-xs px-3 py-1.5 rounded-lg border font-semibold transition bg-slate-800 border-slate-700 text-slate-400 hover:text-white">
+          Andressa
+        </button>
+      </div>
     </header>
 
     <main class="flex-1 p-4 max-w-lg mx-auto w-full space-y-4">
@@ -214,74 +177,60 @@
     };
 
     firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
     const db = firebase.firestore();
 
-    let currentUser = null;
-    let userData = { name: '', initial: 0, current: 0, target: 0, weeklyGoal: 0.8, weights: [], doses: [] };
+    let activeProfile = localStorage.getItem('meta_natal_active_profile') || 'Welton';
+    let userData = { initial: 0, current: 0, target: 0, weeklyGoal: 0.8, weights: [], doses: [] };
     let chartInstance = null;
 
-    // Monitorar Autenticação
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        currentUser = user;
-        document.getElementById('screen-auth').classList.add('hidden');
-        document.getElementById('screen-dashboard').classList.remove('hidden');
-        loadUserData();
+    window.onload = () => {
+      loadUserData(activeProfile);
+    };
+
+    function switchProfile(profileName) {
+      activeProfile = profileName;
+      localStorage.setItem('meta_natal_active_profile', profileName);
+      loadUserData(profileName);
+    }
+
+    function updateHeaderButtons() {
+      const btnWelton = document.getElementById('btn-welton');
+      const btnAndressa = document.getElementById('btn-andressa');
+
+      if (activeProfile === 'Welton') {
+        btnWelton.className = "text-xs px-3 py-1.5 rounded-lg border font-semibold transition bg-emerald-500/20 border-emerald-500/40 text-emerald-300";
+        btnAndressa.className = "text-xs px-3 py-1.5 rounded-lg border font-semibold transition bg-slate-800 border-slate-700 text-slate-400 hover:text-white";
       } else {
-        currentUser = null;
-        document.getElementById('screen-auth').classList.remove('hidden');
-        document.getElementById('screen-dashboard').classList.add('hidden');
-      }
-    });
-
-    async function login() {
-      const email = document.getElementById('authEmail').value;
-      const pass = document.getElementById('authPassword').value;
-      document.getElementById('authError').innerText = '';
-
-      try {
-        await auth.signInWithEmailAndPassword(email, pass);
-      } catch (err) {
-        document.getElementById('authError').innerText = 'Falha no login: ' + err.message;
+        btnAndressa.className = "text-xs px-3 py-1.5 rounded-lg border font-semibold transition bg-rose-500/20 border-rose-500/40 text-rose-300";
+        btnWelton.className = "text-xs px-3 py-1.5 rounded-lg border font-semibold transition bg-slate-800 border-slate-700 text-slate-400 hover:text-white";
       }
     }
 
-    async function register() {
-      const email = document.getElementById('authEmail').value;
-      const pass = document.getElementById('authPassword').value;
-      const name = document.getElementById('authName').value;
-      document.getElementById('authError').innerText = '';
+    async function loadUserData(profileName) {
+      updateHeaderButtons();
+      const docRef = db.collection('profiles').doc(profileName.toLowerCase());
+      const doc = await docRef.get();
 
-      try {
-        const res = await auth.createUserWithEmailAndPassword(email, pass);
-        await db.collection('users').doc(res.user.uid).set({
-          name: name,
-          initial: name === 'Andressa' ? 75.0 : 95.0,
-          current: name === 'Andressa' ? 75.0 : 95.0,
-          target: name === 'Andressa' ? 65.0 : 82.0,
-          weeklyGoal: name === 'Andressa' ? 0.8 : 0.9,
-          weights: [],
-          doses: []
-        });
-      } catch (err) {
-        document.getElementById('authError').innerText = 'Falha ao registrar: ' + err.message;
-      }
-    }
-
-    function logout() { auth.signOut(); }
-
-    async function loadUserData() {
-      const doc = await db.collection('users').doc(currentUser.uid).get();
       if (doc.exists) {
         userData = doc.data();
-        renderDashboard();
+      } else {
+        // Criar perfil padrão na nuvem caso não exista
+        userData = {
+          initial: profileName === 'Andressa' ? 75.0 : 95.0,
+          current: profileName === 'Andressa' ? 75.0 : 95.0,
+          target: profileName === 'Andressa' ? 65.0 : 82.0,
+          weeklyGoal: profileName === 'Andressa' ? 0.8 : 0.9,
+          weights: [],
+          doses: []
+        };
+        await docRef.set(userData);
       }
+      renderDashboard();
     }
 
     function renderDashboard() {
-      document.getElementById('user-name').innerText = userData.name || 'Usuário';
-      document.getElementById('user-avatar').innerText = (userData.name || 'U').charAt(0).toUpperCase();
+      document.getElementById('user-name').innerText = activeProfile;
+      document.getElementById('user-avatar').innerText = activeProfile.charAt(0).toUpperCase();
 
       const initWeight = userData.initial || 0;
       const currWeight = userData.current || 0;
@@ -306,7 +255,6 @@
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       document.getElementById('days-countdown').innerText = `${diffDays} dias`;
 
-      // Renderizar Gráfico
       renderChart();
 
       // Render Histórico de Doses
@@ -337,6 +285,9 @@
 
       if (chartInstance) chartInstance.destroy();
 
+      const mainColor = activeProfile === 'Andressa' ? '#f43f5e' : '#10b981';
+      const bgColor = activeProfile === 'Andressa' ? 'rgba(244, 63, 94, 0.1)' : 'rgba(16, 185, 129, 0.1)';
+
       chartInstance = new Chart(ctx, {
         type: 'line',
         data: {
@@ -344,11 +295,11 @@
           datasets: [{
             label: 'Peso (kg)',
             data: dataPoints.length ? dataPoints : [userData.current],
-            borderColor: '#10b981',
-            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            borderColor: mainColor,
+            backgroundColor: bgColor,
             fill: true,
             tension: 0.3,
-            pointBackgroundColor: '#10b981'
+            pointBackgroundColor: mainColor
           }]
         },
         options: {
@@ -369,7 +320,7 @@
       if (!val) return;
 
       userData.weeklyGoal = val;
-      await db.collection('users').doc(currentUser.uid).update({ weeklyGoal: val });
+      await db.collection('profiles').doc(activeProfile.toLowerCase()).update({ weeklyGoal: val });
       renderDashboard();
     }
 
@@ -382,7 +333,7 @@
       if (!userData.weights) userData.weights = [];
       userData.weights.push({ date: new Date().toLocaleDateString('pt-BR'), weight: val });
 
-      await db.collection('users').doc(currentUser.uid).update({
+      await db.collection('profiles').doc(activeProfile.toLowerCase()).update({
         current: userData.current,
         weights: userData.weights
       });
@@ -403,7 +354,7 @@
         site: site
       });
 
-      await db.collection('users').doc(currentUser.uid).update({ doses: userData.doses });
+      await db.collection('profiles').doc(activeProfile.toLowerCase()).update({ doses: userData.doses });
       renderDashboard();
     }
 
@@ -415,7 +366,7 @@
         userData.initial = initVal;
         userData.target = targetVal;
 
-        await db.collection('users').doc(currentUser.uid).update({
+        await db.collection('profiles').doc(activeProfile.toLowerCase()).update({
           initial: userData.initial,
           target: userData.target
         });
