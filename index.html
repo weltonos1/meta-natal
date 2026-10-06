@@ -67,9 +67,6 @@
           <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Perfil Ativo</span>
           <h2 id="current-profile-name" class="text-xl font-black text-white">Welton</h2>
         </div>
-        <button onclick="openSettingsModal()" class="w-8 h-8 rounded-xl bg-slate-800/80 border border-slate-700/50 flex items-center justify-center text-slate-300 hover:text-white">
-          <i class="fa-solid fa-gear text-xs"></i>
-        </button>
       </div>
 
       <div class="grid grid-cols-3 gap-2 text-center">
@@ -141,7 +138,6 @@
   </main>
 
   <script>
-    // Script básico de exemplo/suporte para navegação e estrutura Firebase (substitua com a sua config se necessário)
     let currentProfile = 'Welton';
 
     function switchProfile(profile) {
@@ -182,7 +178,6 @@
       `;
       list.appendChild(item);
 
-      // Limpar campos
       document.getElementById('goal-start-date').value = '';
       document.getElementById('goal-end-date').value = '';
       document.getElementById('goal-weight-target').value = '';
@@ -197,10 +192,6 @@
       document.getElementById('stat-current').innerText = w + ' kg';
       document.getElementById('weight-input').value = '';
       alert('Peso guardado com sucesso!');
-    }
-
-    function openSettingsModal() {
-      alert('Painel de Definições dos Perfis');
     }
   </script>
 </body>
