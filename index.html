@@ -224,4 +224,453 @@
             <label class="text-[10px] font-semibold text-slate-400 block mb-1">Dose (mg)</label>
             <select id="select-dose-mg" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
               <option value="2.5">2.5 mg</option>
-              <option value
+              <option value="5.0">5.0 mg</option>
+              <option value="7.5">7.5 mg</option>
+              <option value="10.0">10.0 mg</option>
+              <option value="12.5">12.5 mg</option>
+              <option value="15.0">15.0 mg</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[10px] font-semibold text-slate-400 block mb-1">Data da Aplicação</label>
+            <input type="date" id="input-dose-date" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
+          </div>
+        </div>
+        <button type="submit" class="w-full bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/20 font-bold py-2 rounded-xl text-xs transition">
+          Registrar Aplicação de Dose
+        </button>
+      </form>
+    </div>
+
+    <!-- HISTÓRICO DE PESAGENS -->
+    <div class="glass-card p-4 rounded-2xl space-y-3">
+      <h3 class="text-xs font-bold text-white flex items-center gap-2 uppercase tracking-wider">
+        <i class="fa-solid fa-list-check text-emerald-400"></i> Histórico de Pesagens
+      </h3>
+      <div id="history-list" class="space-y-2 max-h-40 overflow-y-auto pr-1"></div>
+    </div>
+
+    <!-- CONQUISTAS -->
+    <div class="glass-card p-4 rounded-2xl space-y-3">
+      <h3 class="text-xs font-bold text-white flex items-center gap-2 uppercase tracking-wider">
+        <i class="fa-solid fa-trophy text-amber-400"></i> Conquistas FitCouple
+      </h3>
+      <div class="grid grid-cols-3 gap-2 text-center" id="badges-container"></div>
+    </div>
+
+  </main>
+
+  <!-- SCRIPTS -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyD2h00k9tpu9K7sx2jBMTFqGBbbp5s",
+      authDomain: "metanatalapp.firebaseapp.com",
+      projectId: "metanatalapp",
+      storageBucket: "metanatalapp.appspot.com",
+      messagingSenderId: "599913862274",
+      appId: "1:599913862274:web:cf7474a4dfc24name6cicl"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.firestore();
+
+    let currentProfile = 'Welton';
+    let weightChartInstance = null;
+
+    let defaultProfiles = {
+      Welton: {
+        name: 'Welton', gender: 'Masc', genderFull: 'Masculino', avatarBg: 'from-emerald-500 to-teal-400',
+        age: 34, height: 1.78, initialWeight: 145.0, currentWeight: 142.6, targetWeight: 120.0,
+        waterCurrent: 1250, waterTarget: 3000, history: [{ date: '01/10', weight: 143.5 }, { date: '05/10', weight: 142.6 }],
+        weeklyGoals: [{ start: '05/10', end: '12/10', target: '-1.0 kg' }],
+        doseMg: '5.0', lastDoseDate: '2026-10-01'
+      },
+      Andressa: {
+        name: 'Andressa', gender: 'Fem', genderFull: 'Feminino', avatarBg: 'from-pink-500 to-rose-400',
+        age: 32, height: 1.65, initialWeight: 75.0, currentWeight: 73.2, targetWeight: 62.0,
+        waterCurrent: 1500, waterTarget: 2500, history: [{ date: '01/10', weight: 74.0 }, { date: '05/10', weight: 73.2 }],
+        weeklyGoals: [{ start: '05/10', end: '12/10', target: '-0.8 kg' }],
+        doseMg: '2.5', lastDoseDate: '2026-10-02'
+      }
+    };
+
+    let profilesData = JSON.parse(JSON.stringify(defaultProfiles));
+
+    window.addEventListener('DOMContentLoaded', () => {
+      switchProfile('Welton');
+      loadDataFromCloud();
+    });
+
+    async function loadDataFromCloud() {
+      try {
+        const wDoc = await db.collection('profiles').doc('Welton').get();
+        if (wDoc.exists && wDoc.data().currentWeight !== undefined) {
+          profilesData.Welton = wDoc.data();
+          if(!profilesData.Welton.weeklyGoals) profilesData.Welton.weeklyGoals = defaultProfiles.Welton.weeklyGoals;
+        } else {
+          await db.collection('profiles').doc('Welton').set(defaultProfiles.Welton);
+        }
+
+        const aDoc = await db.collection('profiles').doc('Andressa').get();
+        if (aDoc.exists && aDoc.data().currentWeight !== undefined) {
+          profilesData.Andressa = aDoc.data();
+          if(!profilesData.Andressa.weeklyGoals) profilesData.Andressa.weeklyGoals = defaultProfiles.Andressa.weeklyGoals;
+        } else {
+          await db.collection('profiles').doc('Andressa').set(defaultProfiles.Andressa);
+        }
+
+        switchProfile(currentProfile);
+      } catch (error) {
+        console.error("Erro ao carregar do Firestore:", error);
+        document.getElementById('sync-status-text').innerText = "Modo Local Seguro";
+        document.getElementById('sync-dot').className = "w-1.5 h-1.5 rounded-full bg-amber-400";
+      }
+    }
+
+    async function saveProfileToCloud(profileName) {
+      try {
+        await db.collection('profiles').doc(profileName).set(profilesData[profileName]);
+        document.getElementById('sync-status-text').innerText = "Cloud Sincronizada";
+        document.getElementById('sync-dot').className = "w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse";
+      } catch (error) {
+        console.error("Erro ao salvar no Firestore:", error);
+        document.getElementById('sync-status-text').innerText = "Erro ao sincronizar";
+        document.getElementById('sync-dot').className = "w-1.5 h-1.5 rounded-full bg-rose-500";
+      }
+    }
+
+    function switchProfile(profileName) {
+      currentProfile = profileName;
+      const data = profilesData[profileName];
+
+      document.getElementById('user-name').innerText = data.name;
+      document.getElementById('user-gender-tag').innerText = data.gender === 'Masc' ? '♂ Masc' : '♀ Fem';
+      document.getElementById('user-age-tag').innerText = `${data.age} anos`;
+      
+      const avatarEl = document.getElementById('user-avatar');
+      avatarEl.innerText = data.name.charAt(0);
+      avatarEl.className = `w-10 h-10 rounded-2xl bg-gradient-to-tr ${data.avatarBg} text-slate-950 flex items-center justify-center font-black text-lg shadow-lg cursor-pointer`;
+
+      if(profileName === 'Welton') {
+        document.getElementById('btn-welton').className = "px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-emerald-500 text-slate-950 shadow";
+        document.getElementById('btn-andressa').className = "px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white";
+      } else {
+        document.getElementById('btn-andressa').className = "px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-pink-500 text-slate-950 shadow";
+        document.getElementById('btn-welton').className = "px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white";
+      }
+
+      updateMetrics();
+      renderChart();
+      renderHistory();
+      renderWeeklyGoals();
+      renderBadges();
+    }
+
+    function updateMetrics() {
+      const data = profilesData[currentProfile];
+
+      const christmasDate = new Date('2026-12-25T00:00:00');
+      const today = new Date();
+      const diffTime = christmasDate - today;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      document.getElementById('days-countdown').innerText = diffDays > 0 ? `${diffDays} dias` : 'Hoje é Natal! 🎄';
+
+      document.getElementById('weight-initial').innerText = `${Number(data.initialWeight).toFixed(1)} kg`;
+      document.getElementById('weight-current').innerText = `${Number(data.currentWeight).toFixed(1)} kg`;
+      document.getElementById('weight-target').innerText = `${Number(data.targetWeight).toFixed(1)} kg`;
+
+      const lost = data.initialWeight - data.currentWeight;
+      document.getElementById('weight-lost').innerText = `${lost >= 0 ? '-' : '+'}${Math.abs(lost).toFixed(1)} kg`;
+
+      const totalToLose = data.initialWeight - data.targetWeight;
+      let percent = totalToLose > 0 ? (lost / totalToLose) * 100 : 0;
+      percent = Math.min(Math.max(percent, 0), 100);
+      document.getElementById('progress-percent').innerText = `${percent.toFixed(0)}%`;
+      document.getElementById('progress-bar').style.width = `${percent}%`;
+
+      document.getElementById('water-current-text').innerText = data.waterCurrent;
+      document.getElementById('water-target-text').innerText = data.waterTarget;
+      let waterPercent = (data.waterCurrent / data.waterTarget) * 100;
+      document.getElementById('water-bar').style.width = `${Math.min(waterPercent, 100)}%`;
+
+      const imc = data.currentWeight / (data.height * data.height);
+      document.getElementById('imc-value').innerText = imc.toFixed(1);
+      document.getElementById('imc-gender-text').innerText = data.genderFull;
+      
+      let imcStatus = 'Normal';
+      let imcColor = 'text-emerald-400';
+      if(imc < 18.5) { imcStatus = 'Abaixo do peso'; imcColor = 'text-sky-400'; }
+      else if(imc >= 25 && imc < 30) { imcStatus = 'Sobrepeso'; imcColor = 'text-amber-400'; }
+      else if(imc >= 30) { imcStatus = 'Obesidade'; imcColor = 'text-rose-400'; }
+      
+      const statusEl = document.getElementById('imc-status');
+      statusEl.innerText = imcStatus;
+      statusEl.className = `text-xs font-bold px-2 py-0.5 rounded-md bg-slate-800 ${imcColor} border border-slate-700`;
+
+      document.getElementById('dose-label').innerText = `Dose Atual: ${data.doseMg} mg`;
+      document.getElementById('input-dose-date').value = data.lastDoseDate;
+      
+      const lastDate = new Date(data.lastDoseDate);
+      const nextDate = new Date(lastDate);
+      nextDate.setDate(nextDate.getDate() + 7);
+      const diffDoseDays = Math.ceil((nextDate - today) / (1000 * 60 * 60 * 24));
+      
+      const reminderText = document.getElementById('dose-next-days');
+      if(diffDoseDays <= 0) {
+        reminderText.innerText = 'Hoje é dia de aplicação! 💉';
+        reminderText.className = 'font-bold text-rose-400';
+      } else {
+        reminderText.innerText = `Em ${diffDoseDays} dias`;
+        reminderText.className = 'font-bold text-emerald-300';
+      }
+    }
+
+    function editInitialWeight() {
+      const data = profilesData[currentProfile];
+      const val = prompt(`Digite o novo Peso Inicial para ${currentProfile} (kg):`, data.initialWeight);
+      if (val !== null) {
+        const newWeight = parseFloat(val.replace(',', '.'));
+        if (!isNaN(newWeight)) {
+          data.initialWeight = newWeight;
+          updateMetrics();
+          saveProfileToCloud(currentProfile);
+        } else {
+          alert('Valor inválido!');
+        }
+      }
+    }
+
+    function editTargetWeight() {
+      const data = profilesData[currentProfile];
+      const val = prompt(`Digite a nova Meta de Peso para ${currentProfile} (kg):`, data.targetWeight);
+      if (val !== null) {
+        const newWeight = parseFloat(val.replace(',', '.'));
+        if (!isNaN(newWeight)) {
+          data.targetWeight = newWeight;
+          updateMetrics();
+          saveProfileToCloud(currentProfile);
+        } else {
+          alert('Valor inválido!');
+        }
+      }
+    }
+
+    function editProfileInfo() {
+      const data = profilesData[currentProfile];
+      const ageVal = prompt('Idade:', data.age);
+      const heightVal = prompt('Altura (ex: 1.65 ou 1.78):', data.height);
+      
+      if(ageVal !== null && heightVal !== null) {
+        data.age = parseInt(ageVal) || data.age;
+        data.height = parseFloat(heightVal.replace(',', '.')) || data.height;
+        switchProfile(currentProfile);
+        saveProfileToCloud(currentProfile);
+      }
+    }
+
+    function addWater(amount) {
+      const data = profilesData[currentProfile];
+      data.waterCurrent += amount;
+      updateMetrics();
+      saveProfileToCloud(currentProfile);
+    }
+
+    function resetWater() {
+      profilesData[currentProfile].waterCurrent = 0;
+      updateMetrics();
+      saveProfileToCloud(currentProfile);
+    }
+
+    function saveWeight(event) {
+      event.preventDefault();
+      const inputVal = document.getElementById('input-weight').value.replace(',', '.');
+      const newWeight = parseFloat(inputVal);
+
+      if(isNaN(newWeight)) return;
+
+      const data = profilesData[currentProfile];
+      data.currentWeight = newWeight;
+      
+      const todayStr = new Date().toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit'});
+      data.history.push({ date: todayStr, weight: newWeight });
+
+      document.getElementById('input-weight').value = '';
+      updateMetrics();
+      renderChart();
+      renderHistory();
+      renderBadges();
+      saveProfileToCloud(currentProfile);
+    }
+
+    function saveWeeklyGoal(event) {
+      event.preventDefault();
+      const startInput = document.getElementById('goal-start-date').value;
+      const endInput = document.getElementById('goal-end-date').value;
+      const targetKg = document.getElementById('goal-target-kg').value;
+
+      if(!startInput || !endInput || !targetKg) return;
+
+      const formatDate = (dateStr) => {
+        const parts = dateStr.split('-');
+        return `${parts[2]}/${parts[1]}`;
+      };
+
+      const data = profilesData[currentProfile];
+      if(!data.weeklyGoals) data.weeklyGoals = [];
+
+      data.weeklyGoals.push({
+        start: formatDate(startInput),
+        end: formatDate(endInput),
+        target: targetKg
+      });
+
+      document.getElementById('goal-start-date').value = '';
+      document.getElementById('goal-end-date').value = '';
+      document.getElementById('goal-target-kg').value = '';
+
+      renderWeeklyGoals();
+      saveProfileToCloud(currentProfile);
+    }
+
+    function deleteWeeklyGoal(index) {
+      const data = profilesData[currentProfile];
+      if(!data.weeklyGoals) return;
+
+      // Como exibimos em ordem invertida (slice().reverse()), ajustamos o índice correto
+      const actualIndex = data.weeklyGoals.length - 1 - index;
+      data.weeklyGoals.splice(actualIndex, 1);
+
+      renderWeeklyGoals();
+      saveProfileToCloud(currentProfile);
+    }
+
+    function renderWeeklyGoals() {
+      const data = profilesData[currentProfile];
+      const container = document.getElementById('weekly-goals-list');
+      container.innerHTML = '';
+
+      if(!data.weeklyGoals || data.weeklyGoals.length === 0) {
+        container.innerHTML = '<span class="text-xs text-slate-500">Nenhuma meta semanal definida.</span>';
+        document.getElementById('weekly-sum-badge').innerText = 'Total Planejado: 0 kg';
+        return;
+      }
+
+      // Calcular soma numérica aproximada dos valores informados
+      let totalSum = 0;
+      data.weeklyGoals.forEach(g => {
+        const num = parseFloat(g.target.replace(',', '.').replace(/[^0-9.-]/g, ''));
+        if(!isNaN(num)) totalSum += num;
+      });
+      document.getElementById('weekly-sum-badge').innerText = `Total Planejado: ${totalSum > 0 ? '-' : ''}${Math.abs(totalSum).toFixed(1)} kg`;
+
+      data.weeklyGoals.slice().reverse().forEach((goal, index) => {
+        const div = document.createElement('div');
+        div.className = "flex justify-between items-center bg-slate-900/90 p-2.5 rounded-xl border border-slate-800 text-xs";
+        div.innerHTML = `
+          <div>
+            <span class="text-emerald-400 font-bold block"><i class="fa-regular fa-calendar mr-1"></i> ${goal.start} até ${goal.end}</span>
+            <span class="text-slate-300 text-[11px]">Meta: <b>${goal.target}</b></span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-1 rounded-lg font-semibold">Ativa 🎯</span>
+            <button onclick="deleteWeeklyGoal(${index})" class="text-slate-500 hover:text-rose-400 p-1 transition" title="Apagar meta">
+              <i class="fa-solid fa-trash-can text-xs"></i>
+            </button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function renderHistory() {
+      const data = profilesData[currentProfile];
+      const container = document.getElementById('history-list');
+      container.innerHTML = '';
+
+      if(!data.history || data.history.length === 0) {
+        container.innerHTML = '<span class="text-xs text-slate-500">Nenhum registo ainda.</span>';
+        return;
+      }
+
+      data.history.slice().reverse().forEach((item) => {
+        const div = document.createElement('div');
+        div.className = "flex justify-between items-center bg-slate-900/80 p-2.5 rounded-xl border border-slate-800 text-xs";
+        div.innerHTML = `
+          <span class="text-slate-300"><i class="fa-regular fa-calendar text-emerald-400 mr-1.5"></i> ${item.date}</span>
+          <span class="font-bold text-emerald-400">${item.weight} kg</span>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function renderBadges() {
+      const data = profilesData[currentProfile];
+      const lost = data.initialWeight - data.currentWeight;
+      const container = document.getElementById('badges-container');
+      
+      const badges = [
+        { title: 'Primeiro Passo', unlocked: data.history.length > 1, icon: 'fa-shoe-prints' },
+        { title: '-1 kg Eliminado', unlocked: lost >= 1.0, icon: 'fa-fire' },
+        { title: '-5 kg Eliminados', unlocked: lost >= 5.0, icon: 'fa-medal' },
+        { title: 'Meta Hidratação', unlocked: data.waterCurrent >= data.waterTarget, icon: 'fa-droplet' },
+        { title: 'Foco Total', unlocked: lost >= 10.0, icon: 'fa-star' }
+      ];
+
+      container.innerHTML = badges.map(b => `
+        <div class="bg-slate-900/90 border ${b.unlocked ? 'border-amber-500/40 text-amber-300' : 'border-slate-800 text-slate-600'} p-2.5 rounded-xl flex flex-col items-center justify-center gap-1">
+          <i class="fa-solid ${b.icon} text-sm"></i>
+          <span class="text-[10px] font-semibold leading-tight">${b.title}</span>
+        </div>
+      `).join('');
+    }
+
+    function saveDose(event) {
+      event.preventDefault();
+      const data = profilesData[currentProfile];
+      data.doseMg = document.getElementById('select-dose-mg').value;
+      data.lastDoseDate = document.getElementById('input-dose-date').value;
+      updateMetrics();
+      saveProfileToCloud(currentProfile);
+      alert('Protocolo de dose atualizado e salvo com sucesso!');
+    }
+
+    function renderChart() {
+      const data = profilesData[currentProfile];
+      const ctx = document.getElementById('weightChart').getContext('2d');
+
+      if(weightChartInstance) {
+        weightChartInstance.destroy();
+      }
+
+      weightChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: data.history.map(item => item.date),
+          datasets: [{
+            label: 'Peso (kg)',
+            data: data.history.map(item => item.weight),
+            borderColor: currentProfile === 'Welton' ? '#10b981' : '#ec4899',
+            backgroundColor: currentProfile === 'Welton' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(236, 72, 153, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.3,
+            pointRadius: 4,
+            pointBackgroundColor: currentProfile === 'Welton' ? '#10b981' : '#ec4899'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#64748b', font: { size: 10 } } },
+            y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#64748b', font: { size: 10 } } }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>
