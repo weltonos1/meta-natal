@@ -67,6 +67,9 @@
           <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Perfil Ativo</span>
           <h2 id="current-profile-name" class="text-xl font-black text-white">Welton</h2>
         </div>
+        <button onclick="openSettingsModal()" class="w-8 h-8 rounded-xl bg-slate-800/80 border border-slate-700/50 flex items-center justify-center text-slate-300 hover:text-white">
+          <i class="fa-solid fa-gear text-xs"></i>
+        </button>
       </div>
 
       <div class="grid grid-cols-3 gap-2 text-center">
@@ -135,64 +138,51 @@
       </div>
     </div>
 
+    <!-- CONTROLO DE ÁGUA -->
+    <div class="glass-card p-4 rounded-2xl space-y-3">
+      <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+        <i class="fa-solid fa-droplet text-blue-400"></i>
+        <span>Hidratação Diária</span>
+      </h3>
+      <div class="flex items-center justify-between bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+        <div>
+          <span id="water-current" class="text-lg font-black text-blue-400">0 ml</span>
+          <span class="text-xs text-slate-400"> / 3000 ml</span>
+        </div>
+        <div class="flex space-x-2">
+          <button onclick="addWater(250)" class="bg-slate-800 hover:bg-slate-700 text-blue-300 px-3 py-1.5 rounded-lg text-xs font-bold">+250ml</button>
+          <button onclick="addWater(500)" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold">+500ml</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- GRÁFICO DE EVOLUÇÃO -->
+    <div class="glass-card p-4 rounded-2xl space-y-3">
+      <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+        <i class="fa-solid fa-chart-line text-emerald-400"></i>
+        <span>Evolução de Peso</span>
+      </h3>
+      <div class="h-48 relative">
+        <canvas id="weightChart"></canvas>
+      </div>
+    </div>
+
   </main>
 
-  <script>
-    let currentProfile = 'Welton';
-
-    function switchProfile(profile) {
-      currentProfile = profile;
-      document.getElementById('current-profile-name').innerText = profile;
-      
-      const btnW = document.getElementById('btn-welton');
-      const btnA = document.getElementById('btn-andressa');
-
-      if (profile === 'Welton') {
-        btnW.className = "px-3 py-1.5 text-xs font-bold rounded-lg transition-all duration-200 flex items-center space-x-1.5 bg-emerald-500 text-slate-950 shadow-md";
-        btnA.className = "px-3 py-1.5 text-xs font-bold rounded-lg transition-all duration-200 flex items-center space-x-1.5 text-slate-400 hover:text-white";
-      } else {
-        btnA.className = "px-3 py-1.5 text-xs font-bold rounded-lg transition-all duration-200 flex items-center space-x-1.5 bg-emerald-500 text-slate-950 shadow-md";
-        btnW.className = "px-3 py-1.5 text-xs font-bold rounded-lg transition-all duration-200 flex items-center space-x-1.5 text-slate-400 hover:text-white";
-      }
-    }
-
-    function addWeeklyGoal() {
-      const start = document.getElementById('goal-start-date').value;
-      const end = document.getElementById('goal-end-date').value;
-      const target = document.getElementById('goal-weight-target').value;
-
-      if (!start || !end || !target) {
-        alert('Por favor, preencha todos os campos da meta semanal!');
-        return;
-      }
-
-      const list = document.getElementById('weekly-goals-list');
-      const item = document.createElement('div');
-      item.className = "bg-slate-900/60 p-2.5 rounded-xl border border-slate-800 flex justify-between items-center text-xs";
-      item.innerHTML = `
+  <!-- MODAL DE DEFINIÇÕES -->
+  <div id="settings-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-card p-5 rounded-2xl w-full max-w-sm space-y-4 border border-slate-700">
+      <h3 class="text-base font-bold text-white">Definições do Perfil (<span id="modal-profile-title">Welton</span>)</h3>
+      <div class="space-y-3">
         <div>
-          <span class="text-emerald-400 font-bold">${start} até ${end}</span>
-          <p class="text-slate-300">Meta: <b>${target}</b> (${currentProfile})</p>
+          <label class="text-xs text-slate-400 block mb-1">Peso Inicial (kg)</label>
+          <input type="number" step="0.1" id="set-initial-weight" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
         </div>
-        <button onclick="this.parentElement.remove()" class="text-red-400 hover:text-red-300 p-1"><i class="fa-solid fa-trash"></i></button>
-      `;
-      list.appendChild(item);
-
-      document.getElementById('goal-start-date').value = '';
-      document.getElementById('goal-end-date').value = '';
-      document.getElementById('goal-weight-target').value = '';
-    }
-
-    function saveWeight() {
-      const w = document.getElementById('weight-input').value;
-      if (!w) {
-        alert('Insira um valor de peso válido!');
-        return;
-      }
-      document.getElementById('stat-current').innerText = w + ' kg';
-      document.getElementById('weight-input').value = '';
-      alert('Peso guardado com sucesso!');
-    }
-  </script>
-</body>
-</html>
+        <div>
+          <label class="text-xs text-slate-400 block mb-1">Meta de Natal (kg)</label>
+          <input type="number" step="0.1" id="set-goal-weight" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
+        </div>
+      </div>
+      <div class="flex space-x-2 pt-2">
+        <button onclick="closeSettingsModal()" class="flex-1 bg-slate-800 text-slate-300 py-2 rounded-xl text-xs font-bold">Cancelar</button>
+        <button onclick="saveSettings()" class="flex-1 bg-emerald-50
