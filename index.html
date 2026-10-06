@@ -538,7 +538,6 @@
       const data = profilesData[currentProfile];
       if(!data.weeklyGoals) return;
 
-      // Como exibimos em ordem invertida (slice().reverse()), ajustamos o índice correto
       const actualIndex = data.weeklyGoals.length - 1 - index;
       data.weeklyGoals.splice(actualIndex, 1);
 
@@ -557,7 +556,6 @@
         return;
       }
 
-      // Calcular soma numérica aproximada dos valores informados
       let totalSum = 0;
       data.weeklyGoals.forEach(g => {
         const num = parseFloat(g.target.replace(',', '.').replace(/[^0-9.-]/g, ''));
